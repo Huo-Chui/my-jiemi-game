@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>手机桌面</title>
   <style>
     * {
@@ -41,6 +41,7 @@
       padding: 12px 24px 6px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 14px;
       font-weight: 600;
       color: #000;
@@ -48,11 +49,22 @@
       border-top-right-radius: 32px;
     }
 
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* 桌面背景 */
     .desktop {
       flex: 1;
       background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-      /* 可以换成你喜欢的背景图：background: url('bg.jpg') center/cover; */
       padding: 30px 24px;
       display: flex;
       flex-wrap: wrap;
@@ -76,6 +88,8 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       text-decoration: none;
       color: #333;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .app-icon:hover {
@@ -88,12 +102,17 @@
       transform: scale(0.95);
     }
 
-    /* 图标内部小图案（纯CSS绘制） */
+    /* 图标内部图案 */
     .icon-img {
       width: 36px;
       height: 36px;
       border-radius: 8px;
       margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: white;
     }
 
     .icon-label {
@@ -106,12 +125,12 @@
       white-space: nowrap;
     }
 
-    /* 微聊图标：绿色聊天气泡 */
-    .wechat-icon {
+    /* 微聊图标：绿色气泡 */
+    .wechat-img {
       background: #09b83e;
       position: relative;
     }
-    .wechat-icon::after {
+    .wechat-img::after {
       content: "";
       position: absolute;
       bottom: 4px;
@@ -123,18 +142,63 @@
       box-shadow: 0 0 0 2px #09b83e;
     }
 
-    /* 飞信图标：蓝色飞鸟或信封 */
-    .feixin-icon {
+    /* 飞信图标：蓝色信封 */
+    .feixin-img {
       background: #007aff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    .feixin-icon::before {
-      content: "✉";
-      font-size: 22px;
-      color: white;
+
+    /* 其他 App 图标背景色 */
+    .app-blue { background: #4A90E2; }
+    .app-red { background: #E74C3C; }
+    .app-yellow { background: #F39C12; }
+    .app-purple { background: #9B59B6; }
+    .app-gray { background: #7F8C8D; }
+    .app-orange { background: #E67E22; }
+    .app-teal { background: #1ABC9C; }
+    .app-black { background: #2C3E50; }
+
+    /* 日历图标特殊样式：显示日期数字 */
+    .calendar-img {
+      background: white;
+      color: #333;
+      border-radius: 8px;
+      flex-direction: column;
+      font-weight: bold;
       line-height: 1;
+    }
+    .calendar-date {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .calendar-month {
+      font-size: 8px;
+      text-transform: uppercase;
+    }
+
+    /* 天气图标 */
+    .weather-img {
+      background: linear-gradient(135deg, #56CCF2, #2F80ED);
+    }
+
+    /* 提示弹出框（模拟 App 打不开） */
+    .toast {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 10;
+    }
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     /* 底部导航条 */
@@ -155,36 +219,171 @@
       background: #999;
       border-radius: 2px;
     }
+
+    /* 日历图标的小红点（模拟未读） */
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #FF3B30;
+      color: white;
+      font-size: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <div class="phone">
-    <!-- 仿 iPhone 状态栏 -->
+    <!-- 状态栏 -->
     <div class="status-bar">
-      <span>9:41</span>
-      <span>📶 🔋 91%</span>
+      <div class="status-left">
+        <span id="currentTime">9:41</span>
+      </div>
+      <div class="status-right">
+        <span id="signalIcon">📶</span>
+        <span id="wifiIcon">📶</span>
+        <span id="batteryIcon">🔋 91%</span>
+      </div>
     </div>
 
-    <!-- 桌面区，放两个APP图标 -->
+    <!-- 桌面图标区 -->
     <div class="desktop">
-      <!-- 微聊 -->
+      <!-- 微聊（可点击） -->
       <a href="wechat.html" class="app-icon" title="微聊">
-        <div class="icon-img wechat-icon"></div>
+        <div class="icon-img wechat-img"></div>
         <span class="icon-label">微聊</span>
       </a>
 
-      <!-- 飞信 -->
+      <!-- 飞信（可点击） -->
       <a href="feixin.html" class="app-icon" title="飞信">
-        <div class="icon-img feixin-icon"></div>
+        <div class="icon-img feixin-img">✉</div>
         <span class="icon-label">飞信</span>
       </a>
-      <!-- 这里未来可以继续添加更多图标，比如相册、备忘录等 -->
+
+      <!-- 小蓝书（不可用） -->
+      <div class="app-icon" onclick="showToast('小蓝书暂未开放')">
+        <div class="icon-img app-red">📕</div>
+        <span class="icon-label">小蓝书</span>
+      </div>
+
+      <!-- qiliqili（不可用） -->
+      <div class="app-icon" onclick="showToast('qiliqili暂未开放')">
+        <div class="icon-img app-blue">▶</div>
+        <span class="icon-label">qiliqili</span>
+      </div>
+
+      <!-- 痘印（不可用） -->
+      <div class="app-icon" onclick="showToast('痘印暂未开放')">
+        <div class="icon-img app-purple">🎵</div>
+        <span class="icon-label">痘印</span>
+      </div>
+
+      <!-- 日历（显示真实日期） -->
+      <div class="app-icon" onclick="showToast('日历暂未开放')">
+        <div class="icon-img calendar-img" id="calendarIcon">
+          <span class="calendar-date" id="calDate">1</span>
+          <span class="calendar-month" id="calMonth">一月</span>
+        </div>
+        <span class="icon-label">日历</span>
+      </div>
+
+      <!-- 天气（不可用） -->
+      <div class="app-icon" onclick="showToast('天气暂未开放')">
+        <div class="icon-img weather-img">☀️</div>
+        <span class="icon-label">天气</span>
+      </div>
+
+      <!-- 浏览器（不可用） -->
+      <div class="app-icon" onclick="showToast('浏览器暂未开放')">
+        <div class="icon-img app-blue">🌐</div>
+        <span class="icon-label">浏览器</span>
+      </div>
+
+      <!-- 应用商店（不可用） -->
+      <div class="app-icon" onclick="showToast('应用商店暂未开放')">
+        <div class="icon-img app-teal">🛒</div>
+        <span class="icon-label">应用商店</span>
+      </div>
+
+      <!-- 设置（不可用） -->
+      <div class="app-icon" onclick="showToast('设置暂未开放')">
+        <div class="icon-img app-gray">⚙️</div>
+        <span class="icon-label">设置</span>
+      </div>
     </div>
 
-    <!-- 底部虚拟Home条 -->
+    <!-- 底部Home条 -->
     <div class="home-bar">
       <div class="home-indicator"></div>
     </div>
+
+    <!-- 提示 Toast -->
+    <div class="toast" id="toast"></div>
   </div>
+
+  <script>
+    // ========== 动态时间与日期 ==========
+    function updateClock() {
+      const now = new Date();
+      // 时间格式 HH:MM
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+
+      // 日历图标日期更新
+      const day = now.getDate();
+      const months = ['一月', '二月', '三月', '四月', '五月', '六月',
+                      '七月', '八月', '九月', '十月', '十一月', '十二月'];
+      const month = months[now.getMonth()];
+      document.getElementById('calDate').textContent = day;
+      document.getElementById('calMonth').textContent = month;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ========== 电池电量获取（尝试真实数据，不支持则显示默认） ==========
+    function updateBattery() {
+      const batteryEl = document.getElementById('batteryIcon');
+      if ('getBattery' in navigator) {
+        navigator.getBattery().then(function(battery) {
+          function updateBatteryStatus() {
+            const level = Math.round(battery.level * 100);
+            const charging = battery.charging ? '⚡' : '🔋';
+            batteryEl.textContent = `${charging} ${level}%`;
+          }
+          updateBatteryStatus();
+          battery.addEventListener('levelchange', updateBatteryStatus);
+          battery.addEventListener('chargingchange', updateBatteryStatus);
+        });
+      } else {
+        // 不支持电池 API，显示静态数据（或可随机模拟）
+        batteryEl.textContent = '🔋 91%';
+      }
+    }
+    updateBattery();
+
+    // ========== 信号/WiFi 图标（简单模拟） ==========
+    // 你可以保持静态，或者根据网络状态改变（此处保持图标）
+    // 实际上无法准确获取 iPad 信号格数，保持固定
+    document.getElementById('signalIcon').textContent = '📶';
+    document.getElementById('wifiIcon').textContent = '📶';
+
+    // ========== Toast 提示 ==========
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1500);
+    }
+  </script>
 </body>
 </html>
