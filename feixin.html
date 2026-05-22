@@ -8,28 +8,23 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f2f5; overflow: hidden; }
 
-    /* 全屏容器 */
     .feixin-container { display: flex; height: 100vh; width: 100vw; background: #fff; }
 
-    /* 左侧边栏 */
+    /* 左侧边栏 - 宽度加大 */
     .sidebar {
-      width: 80px; background: #2d3436; color: #fff;
+      width: 100px; background: #2d3436; color: #fff;
       display: flex; flex-direction: column; align-items: center;
       padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 2;
     }
-    .back-link {
-      color: #b2bec3; font-size: 12px; text-decoration: none;
-      margin-bottom: 15px; display: flex; align-items: center; gap: 2px;
-      transition: 0.2s; cursor: pointer;
-    }
+    .back-link { color: #b2bec3; font-size: 13px; text-decoration: none; margin-bottom: 15px; display: flex; align-items: center; gap: 2px; transition: 0.2s; cursor: pointer; }
     .back-link:hover { color: white; }
-    .welcome-text { font-size: 13px; margin-bottom: 20px; text-align: center; line-height: 1.4; word-break: break-all; padding: 0 4px; }
-    .search-box { width: 60px; height: 30px; background: #636e72; border-radius: 15px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; color: #b2bec3; font-size: 12px; pointer-events: none; opacity: 0.8; }
+    .welcome-text { font-size: 14px; margin-bottom: 20px; text-align: center; line-height: 1.4; word-break: break-all; padding: 0 4px; }
+    .search-box { width: 70px; height: 34px; background: #636e72; border-radius: 17px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; color: #b2bec3; font-size: 13px; pointer-events: none; opacity: 0.8; }
     .nav-modules { display: flex; flex-direction: column; gap: 20px; width: 100%; align-items: center; }
-    .nav-item { width: 60px; height: 60px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #b2bec3; cursor: pointer; transition: 0.2s; user-select: none; }
+    .nav-item { width: 70px; height: 70px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; color: #b2bec3; cursor: pointer; transition: 0.2s; user-select: none; }
     .nav-item.active { background: #0984e3; color: white; box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3); }
     .nav-item.disabled { color: #636e72; pointer-events: none; }
-    .nav-item i { font-size: 22px; margin-bottom: 4px; }
+    .nav-item i { font-size: 24px; margin-bottom: 4px; }
 
     /* 中间联系人列表 */
     .contact-list-panel { width: 240px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 0 0 15px rgba(0,0,0,0.02); }
@@ -44,22 +39,37 @@
     /* 右侧聊天窗口 */
     .chat-window { flex: 1; display: flex; flex-direction: column; background: #f8f9fa; }
     .chat-header { padding: 12px 20px; background: #fff; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
-    .reset-btn { background: #d63031; border: none; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-    .reset-btn:hover { background: #c0392b; }
+    .reset-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; color: white;
+      padding: 8px 18px; border-radius: 25px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(231,76,60,0.3);
+    }
+    .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(231,76,60,0.4); }
+
     .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
     .date-divider { text-align: center; font-size: 12px; color: #999; margin: 16px 0; }
     .message-row { display: flex; margin-bottom: 8px; }
     .message-row.self { justify-content: flex-end; }
     .message-row.other { justify-content: flex-start; }
-    .message-bubble { max-width: 65%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; background: white; border: 1px solid #e0e0e0; position: relative; }
+    .message-bubble { max-width: 50%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; background: white; border: 1px solid #e0e0e0; }
     .message-row.self .message-bubble { background: #d6eaf8; }
     .backup-status { margin-top: 6px; font-size: 11px; color: #7f8c8d; background: #ecf0f1; border-radius: 10px; padding: 3px 12px; display: inline-block; text-align: center; width: fit-content; }
     .file-bubble { cursor: pointer; background: #e8f0fe; border: 1px solid #74b9ff; color: #0984e3; text-decoration: underline; }
-    .option-buttons { display: flex; gap: 8px; margin: 8px 0; }
-    .option-btn { background: #dfe6e9; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.2s; }
-    .option-btn:hover { background: #b2bec3; }
-    .chat-input-bar { padding: 12px 20px; background: #fff; border-top: 1px solid #e0e0e0; display: flex; }
-    .chat-input-bar input { flex: 1; padding: 10px 16px; border: 1px solid #ddd; border-radius: 20px; background: #f5f5f5; pointer-events: none; color: #999; }
+
+    /* 输入框区域 */
+    .chat-input-wrapper { padding: 12px 20px; background: #fff; border-top: 1px solid #e0e0e0; display: flex; flex-direction: column; }
+    .quick-options { display: flex; gap: 8px; margin-bottom: 8px; }
+    .quick-option {
+      background: #f0f0f0; border: 1px solid #ddd; border-radius: 18px;
+      padding: 6px 16px; font-size: 13px; cursor: pointer; transition: 0.2s;
+    }
+    .quick-option:hover { background: #e0e0e0; }
+    .chat-input-bar { display: flex; gap: 8px; }
+    .chat-input-bar input {
+      flex: 1; padding: 10px 16px; border: 1px solid #ddd; border-radius: 20px;
+      background: #f5f5f5; color: #333; font-size: 14px;
+    }
+    .chat-input-bar input:disabled { background: #f5f5f5; color: #999; }
 
     /* 模态框 */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
@@ -75,11 +85,6 @@
     .error-msg { color: #d63031; font-size: 12px; margin-top: 4px; display: none; }
     .submit-btn { background: #0984e3; color: white; border: none; padding: 10px 24px; border-radius: 20px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; }
     .submit-btn:hover { background: #0767b3; }
-    .file-content-card { background: #f8f9fa; border-left: 4px solid #0984e3; padding: 16px; margin: 10px 0; font-size: 14px; line-height: 1.7; white-space: pre-wrap; border-radius: 8px; }
-    .bank-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .bank-table th, .bank-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    .bank-table th { background: #f0f0f0; }
-    .account-info { background: #e8f0fe; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -88,9 +93,10 @@
 <script>
   (function() {
     const STORAGE_KEY = 'feixin_user';
+    const STATE_KEY = 'feixin_state';
     let userInfo = null;
     let currentContact = 'robot';
-    let robotUpdateTriggered = false;
+    let gameState = {};
 
     function isValidChinese(str) { return /^[\u4e00-\u9fa5]+$/.test(str); }
     function generatePhone() { return Array.from({length: 10}, () => Math.floor(Math.random() * 10)).join(''); }
@@ -116,7 +122,17 @@
       '老张': [ {sender:'other', text:'明天项目验收，都准备好。'}, {sender:'self', text:'明白，材料已备齐。'} ],
     };
 
+    // 加载状态
+    function loadState() {
+      const saved = localStorage.getItem(STATE_KEY);
+      gameState = saved ? JSON.parse(saved) : { robotUpdated: false, filesShown: false };
+    }
+    function saveState() {
+      localStorage.setItem(STATE_KEY, JSON.stringify(gameState));
+    }
+
     function renderApp() {
+      loadState();
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         userInfo = JSON.parse(saved);
@@ -201,6 +217,8 @@
           birthday: `${month}月${day}日`, signature: sig
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(userInfo));
+        gameState = { robotUpdated: false, filesShown: false };
+        saveState();
         renderMainUI();
       });
     }
@@ -224,10 +242,15 @@
           <div class="chat-window" id="chatWindow">
             <div class="chat-header">
               <span id="chatTitle">自动备份机器人</span>
-              <button class="reset-btn" id="resetBtn">🔄 重来</button>
+              <button class="reset-btn" id="resetBtn">🔄 重新开始点我</button>
             </div>
             <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-bar"><input type="text" placeholder="暂时无法输入" disabled></div>
+            <div class="chat-input-wrapper">
+              <div class="quick-options" id="quickOptions" style="display:none;"></div>
+              <div class="chat-input-bar">
+                <input type="text" id="chatInput" placeholder="暂时无法输入" disabled>
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -241,12 +264,24 @@
 
       document.getElementById('resetBtn').addEventListener('click', () => {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STATE_KEY);
         location.reload();
       });
 
       switchContact('robot');
-      robotUpdateTriggered = false;
-      setTimeout(triggerRobotUpdate, 5000);
+      // 恢复状态
+      if (gameState.robotUpdated) {
+        if (gameState.filesShown) {
+          // 直接显示文件和选项？不，选项已经选过，所以直接显示文件
+          appendRobotFiles();
+        } else {
+          // 仅触发更新消息和选项，但未选
+          showRobotUpdateAndOptions();
+        }
+      } else {
+        // 尚未触发，设置定时器
+        setTimeout(triggerRobotUpdate, 5000);
+      }
     }
 
     function renderContactList() {
@@ -273,8 +308,24 @@
       if (activeEl) activeEl.classList.add('active');
       document.getElementById('chatTitle').textContent = id === 'robot' ? '自动备份机器人' : id;
       renderMessages(id);
-      if (id === 'robot' && !robotUpdateTriggered) {
-        setTimeout(triggerRobotUpdate, 5000);
+      // 如果不是机器人，禁用输入框并隐藏快捷选项
+      const input = document.getElementById('chatInput');
+      const quickDiv = document.getElementById('quickOptions');
+      if (id !== 'robot') {
+        input.disabled = true;
+        input.placeholder = '暂时无法输入';
+        quickDiv.style.display = 'none';
+      } else {
+        // 机器人的输入状态由状态决定
+        if (gameState.robotUpdated && !gameState.filesShown) {
+          input.disabled = false;
+          input.placeholder = '点击下方选项或输入…';
+          quickDiv.style.display = 'flex';
+        } else {
+          input.disabled = true;
+          input.placeholder = '暂时无法输入';
+          quickDiv.style.display = 'none';
+        }
       }
     }
 
@@ -282,6 +333,19 @@
       const container = document.getElementById('chatMessages');
       if (contactId === 'robot') {
         container.innerHTML = renderRobotMessages();
+        // 恢复已显示的文件或更新消息
+        if (gameState.robotUpdated) {
+          if (!gameState.filesShown) {
+            // 重新添加更新消息和选项
+            const updateDiv = document.createElement('div');
+            updateDiv.className = 'message-row other';
+            updateDiv.innerHTML = '<div class="message-bubble">自动备份机器人更新成功，新版本已为您增添检索功能。您可以输入备份编码查找整理好的文件。如果是未分类文件，您也可以输入关键词进行检索。</div>';
+            container.appendChild(updateDiv);
+          } else {
+            // 直接添加文件消息
+            appendRobotFiles();
+          }
+        }
       } else {
         container.innerHTML = renderOtherContact(contactId);
       }
@@ -302,62 +366,73 @@
       return msgs.map(m => `<div class="message-row ${m.sender==='self'?'self':'other'}"><div class="message-bubble">${m.text}</div></div>`).join('');
     }
 
+    // 触发机器人更新（首次）
     function triggerRobotUpdate() {
-      if (robotUpdateTriggered || currentContact !== 'robot') return;
-      robotUpdateTriggered = true;
-      const container = document.getElementById('chatMessages');
-      const updateDiv = document.createElement('div');
-      updateDiv.innerHTML = `<div class="message-row other"><div class="message-bubble">自动备份机器人更新成功，新版本已为您增添检索功能。您可以输入备份编码查找整理好的文件。如果是未分类文件，您也可以输入关键词进行检索。</div></div>`;
-      container.appendChild(updateDiv);
-
-      const optionsDiv = document.createElement('div');
-      optionsDiv.className = 'option-buttons';
-      optionsDiv.innerHTML = `<button class="option-btn" id="opt1">啊？</button><button class="option-btn" id="opt2">真的假的？</button>`;
-      container.appendChild(optionsDiv);
-      container.scrollTop = container.scrollHeight;
-
-      const handleOption = () => {
-        optionsDiv.remove();
-        ['Home-0806-12', 'Hospital-0616-11', 'Online-0311-10'].forEach(file => {
-          const fileDiv = document.createElement('div');
-          fileDiv.className = 'message-row other';
-          fileDiv.innerHTML = `<div class="message-bubble file-bubble" data-file="${file}">📎 ${file}</div>`;
-          container.appendChild(fileDiv);
-          fileDiv.querySelector('.file-bubble').addEventListener('click', (e) => showFileContent(e.target.dataset.file));
-        });
-        container.scrollTop = container.scrollHeight;
-      };
-      document.getElementById('opt1').addEventListener('click', handleOption);
-      document.getElementById('opt2').addEventListener('click', handleOption);
+      if (gameState.robotUpdated || currentContact !== 'robot') return;
+      gameState.robotUpdated = true;
+      saveState();
+      showRobotUpdateAndOptions();
     }
 
-    function showFileContent(fileCode) {
-      const gender = userInfo.gender;
-      const sibling = gender === '男' ? '哥哥' : '姐姐';
-      let contentHtml = '';
-      if (fileCode === 'Home-0806-12') {
-        contentHtml = `<div class="file-content-card"><strong>📝 电子日记 · Home-0806-12</strong><br><br>我总是在深夜想起她。<br><br>如果那天我没有答应那个项目，如果我坚持让家里人知道她的病情，是不是一切都会不一样。她那么年轻，那么爱笑，每次视频都对我说“${sibling}我没事，就是小感冒”。我竟然信了。<br><br>直到最后，我都没能见到她最后一面。母亲在电话里哭得说不出话，后来她看我的眼神里全是怨恨——因为是我瞒着所有人，是我让她以为只是小病。我永远无法原谅自己。<br><br>这间房子到处都是她的痕迹，她的画笔，她的笑声。可我再也没有妹妹了。</div>`;
-      } else if (fileCode === 'Hospital-0616-11') {
-        contentHtml = `<div class="file-content-card"><strong>📷 手写日记扫描 · Hospital-0616-11</strong><br><span style="font-size:12px;color:#666;">（本人要求上传）</span><br><br>今天天气不错，主治医生说指标有好转，我开心了一整天。隔壁床的阿姨教我织围巾，虽然织得歪歪扭扭，但时间过得很快。<br><br>${sibling}上周又来看我了，带了我最喜欢的草莓蛋糕和一本新的素描本。他/她瘦了好多，我知道他/她因为那个外派项目被公司辞退了，可他/她什么都不跟我说，还假装轻松。我有点担心。<br><br>马上就是我生日了，去年生日他/她带我去游乐园，那是我最开心的一天。对了，那个项目好像就是5月28号开始的，希望今年生日我们能好好过。</div>`;
-      } else if (fileCode === 'Online-0311-10') {
-        contentHtml = `
-          <div>
-            <div class="account-info">🏦 账户：6222 **** **** 5893<br>💰 余额：¥ 48,312.57</div>
-            <table class="bank-table">
-              <tr><th>日期</th><th>摘要</th><th>支出</th><th>余额</th></tr>
-              <tr><td>2025-01-15</td><td>靶向药（克唑替尼）</td><td>-12,500.00</td><td>60,812.57</td></tr>
-              <tr><td>2025-02-14</td><td>化疗辅助药物</td><td>-3,200.00</td><td>57,612.57</td></tr>
-              <tr><td>2025-03-01</td><td>免疫治疗针剂</td><td>-9,300.00</td><td>48,312.57</td></tr>
-            </table>
-            <p style="font-size:12px;color:#666;margin-top:8px;">* 本月费用已缴，余额不足请及时充值</p>
-          </div>`;
-      }
-      const modal = document.createElement('div');
-      modal.className = 'modal-overlay';
-      modal.innerHTML = `<div class="modal-box">${contentHtml}<button class="submit-btn" style="margin-top:16px;" id="closeFileModal">关闭</button></div>`;
-      document.body.appendChild(modal);
-      document.getElementById('closeFileModal').addEventListener('click', () => modal.remove());
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    function showRobotUpdateAndOptions() {
+      if (currentContact !== 'robot') return;
+      const container = document.getElementById('chatMessages');
+      // 添加更新消息
+      const updateDiv = document.createElement('div');
+      updateDiv.className = 'message-row other';
+      updateDiv.innerHTML = '<div class="message-bubble">自动备份机器人更新成功，新版本已为您增添检索功能。您可以输入备份编码查找整理好的文件。如果是未分类文件，您也可以输入关键词进行检索。</div>';
+      container.appendChild(updateDiv);
+
+      // 启用输入框并显示快捷选项
+      const input = document.getElementById('chatInput');
+      const quickDiv = document.getElementById('quickOptions');
+      input.disabled = false;
+      input.placeholder = '点击下方选项或输入…';
+      quickDiv.style.display = 'flex';
+      quickDiv.innerHTML = `
+        <span class="quick-option" data-opt="1">啊？</span>
+        <span class="quick-option" data-opt="2">真的假的？</span>
+      `;
+      document.querySelectorAll('.quick-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          const optText = e.target.textContent;
+          // 发送用户消息
+          const selfDiv = document.createElement('div');
+          selfDiv.className = 'message-row self';
+          selfDiv.innerHTML = `<div class="message-bubble">${optText}</div>`;
+          container.appendChild(selfDiv);
+          // 隐藏选项，禁用输入
+          quickDiv.style.display = 'none';
+          input.disabled = true;
+          input.placeholder = '暂时无法输入';
+          container.scrollTop = container.scrollHeight;
+
+          // 标记文件已显示
+          gameState.filesShown = true;
+          saveState();
+          // 发送三个文件
+          appendRobotFiles();
+        });
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function appendRobotFiles() {
+      if (currentContact !== 'robot') return;
+      const container = document.getElementById('chatMessages');
+      const files = ['Home-0806-12', 'Hospital-0616-11', 'Online-0311-10'];
+      files.forEach(file => {
+        const fileDiv = document.createElement('div');
+        fileDiv.className = 'message-row other';
+        fileDiv.innerHTML = `<div class="message-bubble file-bubble" data-file="${file}">📎 ${file}</div>`;
+        container.appendChild(fileDiv);
+        fileDiv.querySelector('.file-bubble').addEventListener('click', (e) => {
+          const fileName = e.target.dataset.file;
+          // 跳转到对应页面
+          window.location.href = `${fileName.toLowerCase()}.html`;
+        });
+      });
+      container.scrollTop = container.scrollHeight;
     }
 
     renderApp();
