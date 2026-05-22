@@ -10,46 +10,59 @@
       padding: 0;
       box-sizing: border-box;
     }
-    body {
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: #1a1a1a;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    /* 横屏手机外框 */
-    .phone-landscape {
-      width: 700px;
-      max-width: 95vw;
-      height: 380px;
-      max-height: 95vh;
-      background: #f2f2f7;
-      border-radius: 28px;
-      box-shadow: 0 0 0 6px #333, 0 16px 30px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
+    /* 整体容器，占满屏幕 */
+    .wechat-container {
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
+      background: #f2f2f7;
     }
 
-    /* 微聊状态栏 */
+    /* 顶部状态栏 */
     .wechat-status {
       background: #ededed;
-      padding: 4px 16px;
+      padding: 8px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       color: #000;
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
-      height: 24px;
+      height: 36px;
+      border-bottom: 1px solid #ddd;
+    }
+    .back-btn {
+      cursor: pointer;
+      color: #007aff;
+      font-size: 14px;
+      font-weight: normal;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .back-btn:hover {
+      opacity: 0.7;
+    }
+    .status-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 500;
     }
 
-    /* 主内容区 */
+    /* 主内容区（列表+聊天） */
     .wechat-body {
       display: flex;
       flex: 1;
@@ -58,14 +71,14 @@
 
     /* 左侧聊天列表 */
     .chat-list {
-      width: 200px;
+      width: 220px;
+      min-width: 180px;
       background: #fff;
       border-right: 1px solid #ddd;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
     }
-
     .chat-item {
       display: flex;
       align-items: center;
@@ -119,6 +132,7 @@
       font-size: 10px;
       color: #bbb;
       flex-shrink: 0;
+      margin-left: 6px;
     }
     .badge {
       background: #f43530;
@@ -141,6 +155,7 @@
       display: flex;
       flex-direction: column;
       background: #f5f5f5;
+      min-width: 0;
     }
     .chat-header {
       background: #ededed;
@@ -150,6 +165,7 @@
       border-bottom: 1px solid #ddd;
       display: flex;
       align-items: center;
+      height: 36px;
     }
     .chat-messages {
       flex: 1;
@@ -166,8 +182,11 @@
     .message-row.self {
       justify-content: flex-end;
     }
+    .message-row.other {
+      justify-content: flex-start;
+    }
     .message-bubble {
-      max-width: 70%;
+      max-width: 50%;
       padding: 8px 12px;
       border-radius: 12px;
       font-size: 13px;
@@ -211,33 +230,55 @@
       pointer-events: none;
     }
 
-    /* 响应式：小屏适当缩放 */
-    @media (max-width: 750px) {
-      .phone-landscape {
-        width: 100%;
-        height: auto;
-        max-height: 85vh;
-      }
+    /* 响应式：小屏时缩小左侧列表 */
+    @media (max-width: 600px) {
       .chat-list {
         width: 160px;
+        min-width: 140px;
+      }
+      .chat-item {
+        padding: 10px 8px;
+      }
+      .chat-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+        margin-right: 8px;
+      }
+      .chat-name {
+        font-size: 13px;
+      }
+      .chat-preview {
+        font-size: 10px;
+      }
+      .message-bubble {
+        max-width: 65%; /* 小屏上稍微放宽一点 */
+        font-size: 12px;
+      }
+      .wechat-status {
+        padding: 6px 12px;
+        height: 30px;
+        font-size: 12px;
       }
     }
   </style>
 </head>
 <body>
-<div class="phone-landscape">
+<div class="wechat-container">
+  <!-- 顶部状态栏，包含返回按钮 -->
   <div class="wechat-status">
-    <span>9:41</span>
-    <span>微聊</span>
+    <a href="index.html" class="back-btn">← 返回</a>
+    <span class="status-center">微聊</span>
     <span>📶 🔋</span>
   </div>
+
   <div class="wechat-body">
-    <!-- 左侧列表 -->
+    <!-- 左侧聊天列表 -->
     <div class="chat-list" id="chatList">
       <!-- 动态生成 -->
     </div>
 
-    <!-- 右侧聊天 -->
+    <!-- 右侧聊天窗口 -->
     <div class="chat-window" id="chatWindow">
       <div class="chat-header" id="chatHeader">选择一个聊天</div>
       <div class="chat-messages" id="chatMessages"></div>
@@ -261,8 +302,7 @@
     { id: 'news', name: '做法不加班', pinned: false, unread: 0, lastMsg: '做法不加班：客气。睡了，明天值班。', lastTime: '3/29', avatar: '加', color: '#607d8b' }
   ];
 
-  // 消息数据：每条消息 { sender: 'self' 或 'other', text, time }
-  // 群聊中sender用昵称，单聊中other就是对方
+  // 消息数据
   const messagesData = {
     work: [
       { sender: '老张', text: '@所有人 明天周一，大家记得带工牌，门禁系统升级了', time: '3/23 09:15' },
@@ -271,14 +311,12 @@
       { sender: '老张', text: '对，大家注意点', time: '3/23 09:21' },
       { sender: '阿杰', text: '这个点发消息是怕我们周末过得太开心吗', time: '3/23 09:25' },
       { sender: '小李', text: '😂😂😂', time: '3/23 09:26' },
-      // 3/24
       { sender: '小陈', text: '本周三下午三点开月度总结会，请各位准备汇报材料', time: '3/24 08:30' },
       { sender: '王姐', text: '又开会，上个月的材料我还没归档呢', time: '3/24 08:32' },
       { sender: '阿杰', text: '开会是工作的一部分（面无表情）', time: '3/24 08:33' },
       { sender: '老张', text: '请大家认真对待，汇报数据要准确', time: '3/24 08:35' },
       { sender: '小李', text: '收到！第一次参加月度会，好紧张😨', time: '3/24 08:36' },
       { sender: '王姐', text: '@小李 放心，就是走个过场，别紧张', time: '3/24 08:37' },
-      // 3/25
       { sender: '王姐', text: '你们听说没，隔壁部门要合并过来了', time: '3/25 10:10' },
       { sender: '小李', text: '啊？？？', time: '3/25 10:11' },
       { sender: '阿杰', text: '哪个部门？', time: '3/25 10:12' },
@@ -287,7 +325,6 @@
       { sender: '大刘', text: '。', time: '3/25 10:20' },
       { sender: '王姐', text: '我这消息什么时候错过😏', time: '3/25 10:21' },
       { sender: '小李', text: '突然觉得压力好大😱', time: '3/25 10:22' },
-      // 3/26
       { sender: '小陈', text: '下午三点别忘了开会，会议室301', time: '3/26 08:45' },
       { sender: '王姐', text: '收到', time: '3/26 08:46' },
       { sender: '阿杰', text: '我的PPT还没做……', time: '3/26 08:47' },
@@ -299,7 +336,6 @@
       { sender: '小李', text: '我觉得信息量挺大的啊……', time: '3/26 17:07' },
       { sender: '王姐', text: '@小李 三个月后你就懂了', time: '3/26 17:08' },
       { sender: '老张', text: '散了散了，明天还要上班', time: '3/26 17:10' },
-      // 3/27
       { sender: '王姐', text: '今天午餐拼单，有人吗？', time: '3/27 11:30' },
       { sender: '小李', text: '我我我！', time: '3/27 11:31' },
       { sender: '阿杰', text: '+1', time: '3/27 11:32' },
@@ -312,7 +348,6 @@
       { sender: '阿杰', text: '我现在嘴巴还是麻的', time: '3/27 13:06' },
       { sender: '王姐', text: '下次还拼吗', time: '3/27 13:07' },
       { sender: '主角', text: '拼', time: '3/27 13:08' },
-      // 3/28
       { sender: '老张', text: '本周工作总结发一下，@所有人', time: '3/28 16:00' },
       { sender: '小李', text: '已发！✉️', time: '3/28 16:01' },
       { sender: '王姐', text: '发了', time: '3/28 16:02' },
@@ -324,7 +359,6 @@
       { sender: '小陈', text: '周五了，大家周末愉快', time: '3/28 16:10' },
       { sender: '阿杰', text: '明天还要加班改图，不愉快', time: '3/28 16:11' },
       { sender: '王姐', text: '心疼你两秒，然后我去逛街了', time: '3/28 16:12' },
-      // 3/29
       { sender: '王姐', text: '周末有人看新上映的电影吗，据说口碑炸裂', time: '3/29 14:30' },
       { sender: '小李', text: '哪部哪部？', time: '3/29 14:31' },
       { sender: '王姐', text: '就那个悬疑片，朋友圈刷屏了', time: '3/29 14:32' },
@@ -420,7 +454,6 @@
       { sender: '做法不加班', text: '。', time: '3/23 18:25' },
       { sender: '妹妹', text: '不加班你今天怎么不说话', time: '3/23 18:26' },
       { sender: '做法不加班', text: '在改稿，先挂着', time: '3/23 18:27' },
-      // 3/24
       { sender: '不羡仙', text: '周末谁有空，出来吃饭！', time: '3/24 11:00' },
       { sender: '妹妹', text: '我我我！这周累死了需要补充能量', time: '3/24 11:01' },
       { sender: '不羡仙', text: '补充能量=火锅，懂', time: '3/24 11:02' },
@@ -428,7 +461,6 @@
       { sender: '妹妹', text: '烤肉也行，但是我投火锅一票', time: '3/24 11:04' },
       { sender: '请支持公益！', text: '我都可以，看大家', time: '3/24 11:05' },
       { sender: '做法不加班', text: '你们定，我到点就来', time: '3/24 11:06' },
-      // 3/25
       { sender: '皮蛋solo粥', text: '[视频] 这个土味短剧绝了，我训练的时候都在想台词', time: '3/25 12:15' },
       { sender: '妹妹', text: '这什么东西哈哈哈哈哈', time: '3/25 12:16' },
       { sender: '不羡仙', text: '我看完了，居然有点上头', time: '3/25 12:17' },
@@ -436,7 +468,6 @@
       { sender: '做法不加班', text: '别看了，浪费时间，我帮你们看了，就是烂尾', time: '3/25 12:19' },
       { sender: '主角', text: '你什么时候看的', time: '3/25 12:20' },
       { sender: '做法不加班', text: '昨晚加班到凌晨，顺便刷完了', time: '3/25 12:21' },
-      // 3/26
       { sender: '不羡仙', text: '最近有没有人想去爬山，我找到一条很出片的路线', time: '3/26 10:05' },
       { sender: '皮蛋solo粥', text: '爬！不过别太陡，我怕我膝盖扛不住', time: '3/26 10:06' },
       { sender: '妹妹', text: '多大难度算不难', time: '3/26 10:07' },
@@ -445,7 +476,6 @@
       { sender: '主角', text: '报名', time: '3/26 10:10' },
       { sender: '请支持公益！', text: '我也去，刚好可以顺便看看那边有没有需要帮助的村子', time: '3/26 10:11' },
       { sender: '做法不加班', text: '你们安排，我到时候看能不能走得开', time: '3/26 10:12' },
-      // 3/27
       { sender: '妹妹', text: '[图片] 路边看到一只流浪猫，好乖', time: '3/27 17:40' },
       { sender: '请支持公益！', text: '好小一只，附近有没有宠物医院？要不先带去看看', time: '3/27 17:41' },
       { sender: '皮蛋solo粥', text: '你随身带猫粮吗', time: '3/27 17:42' },
@@ -454,7 +484,6 @@
       { sender: '妹妹', text: '真的吗！是用手机随便拍的', time: '3/27 17:45' },
       { sender: '做法不加班', text: '猫的眼神很警惕，估计是刚走丢的', time: '3/27 17:46' },
       { sender: '请支持公益！', text: '附近有没有小区群？先问问看是不是有人丢了猫', time: '3/27 17:47' },
-      // 3/28
       { sender: '不羡仙', text: '周五了！素材剪完了！感觉这次播放量要涨', time: '3/28 20:10' },
       { sender: '皮蛋solo粥', text: '播放量高了你请客', time: '3/28 20:11' },
       { sender: '不羡仙', text: '请，必须请，火锅我都认了', time: '3/28 20:12' },
@@ -463,7 +492,6 @@
       { sender: '做法不加班', text: '周五而已，我明天还要加班排版', time: '3/28 20:15' },
       { sender: '主角', text: '不加班太惨了，周六我们发好吃的照片给你', time: '3/28 20:16' },
       { sender: '做法不加班', text: '你们是魔鬼吗', time: '3/28 20:17' },
-      // 3/29
       { sender: '主角', text: '过几天一起出来玩吧，好久没聚了', time: '3/29 11:00' },
       { sender: '妹妹', text: '可以可以！', time: '3/29 11:01' },
       { sender: '皮蛋solo粥', text: '终于等到这句话，训练累死我了', time: '3/29 11:02' },
@@ -604,9 +632,9 @@
       const senderName = msg.sender === 'self' ? '' : msg.sender;
       html += `
         <div class="message-row ${isSelf ? 'self' : 'other'}">
-          <div>
+          <div style="width: 100%; ${isSelf ? 'display: flex; flex-direction: column; align-items: flex-end;' : 'display: flex; flex-direction: column; align-items: flex-start;'}">
             ${!isSelf ? `<div style="font-size:10px;color:#999;margin-bottom:2px;">${senderName}</div>` : ''}
-            <div class="message-bubble">${msg.text}</div>
+            <div class="message-bubble" style="max-width:100%;">${msg.text}</div>
             <div class="message-time">${msg.time.split(' ')[1] || ''}</div>
           </div>
         </div>
