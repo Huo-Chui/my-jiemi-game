@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home-0806-12</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; padding: 20px; max-width: 600px; margin: 0 auto; }
+    .card { background: white; border-left: 4px solid #0984e3; padding: 20px; border-radius: 8px; line-height: 1.7; }
+    .back-btn { display: inline-block; margin-top: 20px; color: #0984e3; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card" id="content"></div>
+  <a href="feixin.html" class="back-btn">← 返回飞信</a>
+  <script>
+    (function() {
+      const user = JSON.parse(localStorage.getItem('feixin_user'));
+      const sibling = user?.gender === '男' ? '哥哥' : '姐姐';
+      const html = `
+        <strong>📝 电子日记 · Home-0806-12</strong><br><br>
+        我又打开这个文档了。<br><br>
+        从什么时候开始，我习惯了一个人扛着秘密。她生病的事，只有我知道。她笑着说“别告诉妈，她心脏受不了”，我就真的谁也没说。每次去医院看她，她都在安慰我：“${sibling}，我很快就好了，就是个小毛病。”<br><br>
+        可我比谁都清楚，那不是小毛病。<br><br>
+        我主动申请调离了那个外派项目，然后辞了职。她哭着骂我傻，我说工作可以再找，妹妹只有一个。她生日那天，我们偷偷溜出医院，去了她最爱的游乐园。那是去年5月28号，她笑得像从来没生过病一样。<br><br>
+        直到最后，她都在保护我，保护妈妈。妈妈后来知道了，没有怪我，只是长久地看着我，眼神里有太多东西，不是怨恨，是一种说不清的……也许她也在心疼我。<br><br>
+        可我依然觉得，如果当初我再多做一点，也许结局会不一样。这间屋子，到处都是她的痕迹，她的画笔，她的笑声。我永远失去了妹妹。
+      `;
+      document.getElementById('content').innerHTML = html;
+    })();
+  </script>
+</body>
+</html>
