@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital-0616-11</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; padding: 20px; max-width: 600px; margin: 0 auto; }
+    .card { background: white; border-left: 4px solid #e17055; padding: 20px; border-radius: 8px; line-height: 1.7; }
+    .back-btn { display: inline-block; margin-top: 20px; color: #0984e3; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card" id="content"></div>
+  <a href="feixin.html" class="back-btn">← 返回飞信</a>
+  <script>
+    (function() {
+      const user = JSON.parse(localStorage.getItem('feixin_user'));
+      const sibling = user?.gender === '男' ? '哥哥' : '姐姐';
+      const pronoun = user?.gender === '男' ? '他' : '她';
+      const html = `
+        <strong>📷 手写日记扫描 · Hospital-0616-11</strong><br>
+        <span style="font-size:12px;color:#666;">（本人要求上传）</span><br><br>
+        今天阳光很好，主治医生说指标有好转，我开心了一整天。隔壁床的阿姨教我织围巾，虽然织得歪歪扭扭，但时间过得很快。<br><br>
+        ${sibling}上周又来看我了，带了草莓蛋糕和新素描本。${pronoun}瘦了好多，我知道${pronoun}为了照顾我，拒绝了外派项目，还把工作辞了。可${pronoun}什么都不说，还假装轻松，我有点担心。<br><br>
+        去年我生日（5月28号）的时候，${sibling}带我去了游乐园，那是我最开心的一天。希望今年生日，我们还能一起过。
+      `;
+      document.getElementById('content').innerHTML = html;
+    })();
+  </script>
+</body>
+</html>
