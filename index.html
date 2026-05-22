@@ -61,22 +61,23 @@
       gap: 6px;
     }
 
-    /* 桌面背景 */
+    /* 桌面背景 - 使用 Grid 三列布局 */
     .desktop {
       flex: 1;
       background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-      padding: 30px 0;  /* 左右 padding 去掉，交给 space-evenly */
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-evenly;
+      padding: 30px 18px; /* 左右 padding 相同，保证边缘等距 */
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px; /* 图标之间的间距 */
       align-content: flex-start;
-      row-gap: 24px;
     }
 
     /* App 图标 */
     .app-icon {
-      width: 70px;
-      height: 70px;
+      width: 100%; /* 由 grid 列宽决定 */
+      aspect-ratio: 1 / 1; /* 正方形 */
+      max-width: 70px;
+      justify-self: center; /* 在列内居中 */
       background: rgba(255,255,255,0.85);
       backdrop-filter: blur(10px);
       border-radius: 18px;
@@ -91,7 +92,14 @@
       color: #333;
       position: relative;
       -webkit-tap-highlight-color: transparent;
-      flex-shrink: 0;
+    }
+
+    /* 占位符：透明、不可交互 */
+    .app-icon.placeholder {
+      visibility: hidden;
+      pointer-events: none;
+      background: transparent;
+      box-shadow: none;
     }
 
     .app-icon:hover {
@@ -218,12 +226,11 @@
       border-radius: 2px;
     }
 
-    /* 响应式调整：小屏幕下缩小图标，保证三列依然美观 */
+    /* 响应式调整 */
     @media (max-width: 400px) {
       .app-icon {
-        width: 60px;
-        height: 60px;
         border-radius: 14px;
+        max-width: 60px;
       }
       .icon-img {
         width: 30px;
@@ -243,6 +250,10 @@
         font-size: 12px;
         padding: 10px 18px 4px;
       }
+      .desktop {
+        padding: 24px 14px;
+        gap: 14px;
+      }
     }
   </style>
 </head>
@@ -259,7 +270,7 @@
       </div>
     </div>
 
-    <!-- 桌面图标区 -->
+    <!-- 桌面图标区（三列网格） -->
     <div class="desktop">
       <!-- 微聊（可点击） -->
       <a href="wechat.html" class="app-icon" title="微聊">
@@ -273,25 +284,25 @@
         <span class="icon-label">飞信</span>
       </a>
 
-      <!-- 小蓝书（不可用） -->
+      <!-- 小蓝书 -->
       <div class="app-icon" onclick="showToast('小蓝书暂未开放')">
         <div class="icon-img app-red">📕</div>
         <span class="icon-label">小蓝书</span>
       </div>
 
-      <!-- qiliqili（不可用） -->
+      <!-- qiliqili -->
       <div class="app-icon" onclick="showToast('qiliqili暂未开放')">
         <div class="icon-img app-blue">▶</div>
         <span class="icon-label">qiliqili</span>
       </div>
 
-      <!-- 痘印（不可用） -->
+      <!-- 痘印 -->
       <div class="app-icon" onclick="showToast('痘印暂未开放')">
         <div class="icon-img app-purple">🎵</div>
         <span class="icon-label">痘印</span>
       </div>
 
-      <!-- 日历（显示真实日期） -->
+      <!-- 日历 -->
       <div class="app-icon" onclick="showToast('日历暂未开放')">
         <div class="icon-img calendar-img" id="calendarIcon">
           <span class="calendar-date" id="calDate">1</span>
@@ -323,6 +334,10 @@
         <div class="icon-img app-gray">⚙️</div>
         <span class="icon-label">设置</span>
       </div>
+
+      <!-- 两个透明占位符，填补最后一行，确保对称 -->
+      <div class="app-icon placeholder" aria-hidden="true"></div>
+      <div class="app-icon placeholder" aria-hidden="true"></div>
     </div>
 
     <!-- 底部Home条 -->
@@ -342,13 +357,11 @@
       const minutes = now.getMinutes().toString().padStart(2, '0');
       document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
 
-      // 日历图标日期更新
       const day = now.getDate();
       const months = ['一月', '二月', '三月', '四月', '五月', '六月',
                       '七月', '八月', '九月', '十月', '十一月', '十二月'];
-      const month = months[now.getMonth()];
       document.getElementById('calDate').textContent = day;
-      document.getElementById('calMonth').textContent = month;
+      document.getElementById('calMonth').textContent = months[now.getMonth()];
     }
     updateClock();
     setInterval(updateClock, 1000);
@@ -360,8 +373,7 @@
         navigator.getBattery().then(function(battery) {
           function updateBatteryStatus() {
             const level = Math.round(battery.level * 100);
-            const charging = battery.charging ? '⚡' : '🔋';
-            batteryEl.textContent = `${charging} ${level}%`;
+            batteryEl.textContent = (battery.charging ? '⚡' : '🔋') + ' ' + level + '%';
           }
           updateBatteryStatus();
           battery.addEventListener('levelchange', updateBatteryStatus);
