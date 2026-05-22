@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>飞信 · 工作平台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f2f5; overflow: hidden; }
+
+    /* 全屏容器 */
+    .feixin-container { display: flex; height: 100vh; width: 100vw; background: #fff; }
+
+    /* 左侧边栏 */
+    .sidebar {
+      width: 80px; background: #2d3436; color: #fff;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 2;
+    }
+    .back-link {
+      color: #b2bec3; font-size: 12px; text-decoration: none;
+      margin-bottom: 15px; display: flex; align-items: center; gap: 2px;
+      transition: 0.2s; cursor: pointer;
+    }
+    .back-link:hover { color: white; }
+    .welcome-text { font-size: 13px; margin-bottom: 20px; text-align: center; line-height: 1.4; word-break: break-all; padding: 0 4px; }
+    .search-box { width: 60px; height: 30px; background: #636e72; border-radius: 15px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; color: #b2bec3; font-size: 12px; pointer-events: none; opacity: 0.8; }
+    .nav-modules { display: flex; flex-direction: column; gap: 20px; width: 100%; align-items: center; }
+    .nav-item { width: 60px; height: 60px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #b2bec3; cursor: pointer; transition: 0.2s; user-select: none; }
+    .nav-item.active { background: #0984e3; color: white; box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3); }
+    .nav-item.disabled { color: #636e72; pointer-events: none; }
+    .nav-item i { font-size: 22px; margin-bottom: 4px; }
+
+    /* 中间联系人列表 */
+    .contact-list-panel { width: 240px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 0 0 15px rgba(0,0,0,0.02); }
+    .contact-item { display: flex; align-items: center; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f5; transition: 0.2s; }
+    .contact-item:hover { background: #f8f9fa; }
+    .contact-item.active { background: #e3f2fd; }
+    .contact-avatar { width: 40px; height: 40px; border-radius: 8px; background: #dfe6e9; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: #2d3436; font-weight: bold; flex-shrink: 0; }
+    .contact-info { overflow: hidden; }
+    .contact-name { font-size: 14px; font-weight: 500; }
+    .contact-last { font-size: 11px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* 右侧聊天窗口 */
+    .chat-window { flex: 1; display: flex; flex-direction: column; background: #f8f9fa; }
+    .chat-header { padding: 12px 20px; background: #fff; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+    .reset-btn { background: #d63031; border: none; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+    .reset-btn:hover { background: #c0392b; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+    .date-divider { text-align: center; font-size: 12px; color: #999; margin: 16px 0; }
+    .message-row { display: flex; margin-bottom: 8px; }
+    .message-row.self { justify-content: flex-end; }
+    .message-row.other { justify-content: flex-start; }
+    .message-bubble { max-width: 65%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; background: white; border: 1px solid #e0e0e0; position: relative; }
+    .message-row.self .message-bubble { background: #d6eaf8; }
+    .backup-status { margin-top: 6px; font-size: 11px; color: #7f8c8d; background: #ecf0f1; border-radius: 10px; padding: 3px 12px; display: inline-block; text-align: center; width: fit-content; }
+    .file-bubble { cursor: pointer; background: #e8f0fe; border: 1px solid #74b9ff; color: #0984e3; text-decoration: underline; }
+    .option-buttons { display: flex; gap: 8px; margin: 8px 0; }
+    .option-btn { background: #dfe6e9; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; transition: 0.2s; }
+    .option-btn:hover { background: #b2bec3; }
+    .chat-input-bar { padding: 12px 20px; background: #fff; border-top: 1px solid #e0e0e0; display: flex; }
+    .chat-input-bar input { flex: 1; padding: 10px 16px; border: 1px solid #ddd; border-radius: 20px; background: #f5f5f5; pointer-events: none; color: #999; }
+
+    /* 模态框 */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal-box { background: white; border-radius: 16px; padding: 24px; width: 90%; max-width: 420px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    .modal-box h3 { margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #555; }
+    .name-inputs { display: flex; gap: 8px; }
+    .name-inputs input { width: 70px; text-align: center; }
+    input[type="text"], input[type="number"] { padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; width: 100%; }
+    .radio-group { display: flex; gap: 20px; }
+    .radio-group label { display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; }
+    .error-msg { color: #d63031; font-size: 12px; margin-top: 4px; display: none; }
+    .submit-btn { background: #0984e3; color: white; border: none; padding: 10px 24px; border-radius: 20px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; }
+    .submit-btn:hover { background: #0767b3; }
+    .file-content-card { background: #f8f9fa; border-left: 4px solid #0984e3; padding: 16px; margin: 10px 0; font-size: 14px; line-height: 1.7; white-space: pre-wrap; border-radius: 8px; }
+    .bank-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .bank-table th, .bank-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .bank-table th { background: #f0f0f0; }
+    .account-info { background: #e8f0fe; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+  (function() {
+    const STORAGE_KEY = 'feixin_user';
+    let userInfo = null;
+    let currentContact = 'robot';
+    let robotUpdateTriggered = false;
+
+    function isValidChinese(str) { return /^[\u4e00-\u9fa5]+$/.test(str); }
+    function generatePhone() { return Array.from({length: 10}, () => Math.floor(Math.random() * 10)).join(''); }
+
+    const backupRecords = [
+      { date: '3/23', file: '工作周报0323.docx', type: 'success' },
+      { date: '3/23', file: '会议纪要0323.pdf', type: 'success' },
+      { date: '3/24', file: '体检报告0324.pdf', type: 'success' },
+      { date: '3/25', file: '项目进度表.xlsx', type: 'fail' },
+      { date: '3/25', file: '项目进度表(重传).xlsx', type: 'success' },
+      { date: '3/26', file: '血常规报告.pdf', type: 'success' },
+      { date: '3/27', file: 'CT影像资料.zip', type: 'fail' },
+      { date: '3/27', file: 'CT影像资料.zip', type: 'success' },
+      { date: '3/28', file: '外勤审批单.pdf', type: 'success' },
+      { date: '3/29', file: '心电图报告0329.pdf', type: 'success' },
+    ];
+
+    const otherContacts = {
+      '大刘': [ {sender:'other', text:'那个报表下班前发我。'}, {sender:'self', text:'好的，已经发了。'} ],
+      '王姐': [ {sender:'other', text:'今天午餐拼单，来不来？'}, {sender:'self', text:'来，老地方。'} ],
+      '小李': [ {sender:'other', text:'救命，打印机又卡纸了！'}, {sender:'self', text:'重启一下试试。'} ],
+      '阿杰': [ {sender:'other', text:'设计稿改完了，看下邮件。'}, {sender:'self', text:'收到，辛苦了。'} ],
+      '老张': [ {sender:'other', text:'明天项目验收，都准备好。'}, {sender:'self', text:'明白，材料已备齐。'} ],
+    };
+
+    function renderApp() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        userInfo = JSON.parse(saved);
+        renderMainUI();
+      } else {
+        renderSetupModal();
+      }
+    }
+
+    function renderSetupModal() {
+      const phone = generatePhone();
+      document.getElementById('app').innerHTML = `
+        <div class="modal-overlay" id="setupModal">
+          <div class="modal-box">
+            <h3>🔧 系统升级 · 个人信息设置</h3>
+            <p style="font-size:13px;color:#666;margin-bottom:20px;">请完善以下信息，部分字段已自动生成</p>
+            <div class="form-group">
+              <label>头像（自动生成）</label>
+              <div id="avatarPreview" style="width:50px;height:50px;border-radius:50%;background:#74b9ff;color:white;display:flex;align-items:center;justify-content:center;font-size:22px;">?</div>
+            </div>
+            <div class="form-group">
+              <label>姓名</label>
+              <div class="name-inputs">
+                <input type="text" id="lastName" placeholder="姓(最多2字)" maxlength="2">
+                <input type="text" id="firstName" placeholder="名(最多2字)" maxlength="2">
+              </div>
+              <div class="error-msg" id="nameError">请输入汉字</div>
+            </div>
+            <div class="form-group">
+              <label>性别</label>
+              <div class="radio-group">
+                <label><input type="radio" name="gender" value="男" checked> 男</label>
+                <label><input type="radio" name="gender" value="女"> 女</label>
+              </div>
+            </div>
+            <div class="form-group"><label>地区</label><input type="text" value="瀛洲市" disabled></div>
+            <div class="form-group"><label>手机号</label><input type="text" value="${phone}" disabled id="phoneField"></div>
+            <div class="form-group">
+              <label>生日（月/日可修改）</label>
+              <div style="display:flex;gap:8px;">
+                <select id="birthMonth">${Array.from({length:12}, (_,i) => `<option value="${i+1}" ${(new Date().getMonth()+1===i+1)?'selected':''}>${i+1}月</option>`).join('')}</select>
+                <select id="birthDay">${Array.from({length:31}, (_,i) => `<option value="${i+1}" ${(new Date().getDate()===i+1)?'selected':''}>${i+1}日</option>`).join('')}</select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>个人签名（最多10个汉字）</label>
+              <input type="text" id="signature" placeholder="必填" maxlength="10">
+              <div class="error-msg" id="sigError">请输入1-10个汉字</div>
+            </div>
+            <button class="submit-btn" id="submitSetup">进入飞信</button>
+          </div>
+        </div>
+      `;
+      const lastName = document.getElementById('lastName');
+      const firstName = document.getElementById('firstName');
+      const updateAvatar = () => {
+        const name = (lastName.value.trim() + firstName.value.trim()) || '?';
+        document.getElementById('avatarPreview').textContent = name.charAt(0);
+      };
+      lastName.addEventListener('input', updateAvatar);
+      firstName.addEventListener('input', updateAvatar);
+
+      document.getElementById('submitSetup').addEventListener('click', () => {
+        const ln = lastName.value.trim(), fn = firstName.value.trim();
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+        const month = document.getElementById('birthMonth').value;
+        const day = document.getElementById('birthDay').value;
+        const sig = document.getElementById('signature').value.trim();
+
+        if (!isValidChinese(ln) || !isValidChinese(fn) || ln.length>2 || fn.length>2 || ln.length===0 || fn.length===0) {
+          document.getElementById('nameError').style.display='block'; return;
+        }
+        document.getElementById('nameError').style.display='none';
+        if (!isValidChinese(sig) || sig.length<1 || sig.length>10) {
+          document.getElementById('sigError').style.display='block'; return;
+        }
+        document.getElementById('sigError').style.display='none';
+
+        userInfo = {
+          lastName: ln, firstName: fn, fullName: ln+fn, gender,
+          region: '瀛洲市', phone: document.getElementById('phoneField').value,
+          birthday: `${month}月${day}日`, signature: sig
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(userInfo));
+        renderMainUI();
+      });
+    }
+
+    function renderMainUI() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="feixin-container">
+          <div class="sidebar">
+            <a href="index.html" class="back-link">← 桌面</a>
+            <div class="welcome-text">欢迎回来，<br>${userInfo.firstName || userInfo.fullName}</div>
+            <div class="search-box">🔍</div>
+            <div class="nav-modules">
+              <div class="nav-item active" id="navMessage"><i>💬</i> 消息</div>
+              <div class="nav-item disabled"><i>📋</i> 工作台</div>
+              <div class="nav-item disabled"><i>👥</i> 通讯录</div>
+              <div class="nav-item disabled"><i>⋯</i> 更多</div>
+            </div>
+          </div>
+          <div class="contact-list-panel" id="contactListPanel">${renderContactList()}</div>
+          <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+              <span id="chatTitle">自动备份机器人</span>
+              <button class="reset-btn" id="resetBtn">🔄 重来</button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-bar"><input type="text" placeholder="暂时无法输入" disabled></div>
+          </div>
+        </div>
+      `;
+
+      document.querySelectorAll('.contact-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const id = item.dataset.id;
+          if (id) switchContact(id);
+        });
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      });
+
+      switchContact('robot');
+      robotUpdateTriggered = false;
+      setTimeout(triggerRobotUpdate, 5000);
+    }
+
+    function renderContactList() {
+      const contacts = [
+        { id: 'robot', name: '自动备份机器人', avatar: '🤖' },
+        { id: '大刘', name: '大刘', avatar: '刘' },
+        { id: '王姐', name: '王姐', avatar: '王' },
+        { id: '小李', name: '小李', avatar: '李' },
+        { id: '阿杰', name: '阿杰', avatar: '杰' },
+        { id: '老张', name: '老张', avatar: '张' },
+      ];
+      return contacts.map(c => `
+        <div class="contact-item ${c.id===currentContact?'active':''}" data-id="${c.id}">
+          <div class="contact-avatar">${c.avatar}</div>
+          <div class="contact-info"><div class="contact-name">${c.name}</div><div class="contact-last">${c.id==='robot'?'备份记录':'...'}</div></div>
+        </div>
+      `).join('');
+    }
+
+    function switchContact(id) {
+      currentContact = id;
+      document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+      const activeEl = document.querySelector(`.contact-item[data-id="${id}"]`);
+      if (activeEl) activeEl.classList.add('active');
+      document.getElementById('chatTitle').textContent = id === 'robot' ? '自动备份机器人' : id;
+      renderMessages(id);
+      if (id === 'robot' && !robotUpdateTriggered) {
+        setTimeout(triggerRobotUpdate, 5000);
+      }
+    }
+
+    function renderMessages(contactId) {
+      const container = document.getElementById('chatMessages');
+      if (contactId === 'robot') {
+        container.innerHTML = renderRobotMessages();
+      } else {
+        container.innerHTML = renderOtherContact(contactId);
+      }
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderRobotMessages() {
+      let html = '', lastDate = '';
+      backupRecords.forEach(rec => {
+        if (rec.date !== lastDate) { html += `<div class="date-divider">${rec.date}</div>`; lastDate = rec.date; }
+        html += `<div class="message-row self"><div><div class="message-bubble">${rec.file}</div><div class="backup-status">${rec.type==='success' ? '✅ 备份成功' : '❌ 备份失败'}</div></div></div>`;
+      });
+      return html;
+    }
+
+    function renderOtherContact(name) {
+      const msgs = otherContacts[name] || [];
+      return msgs.map(m => `<div class="message-row ${m.sender==='self'?'self':'other'}"><div class="message-bubble">${m.text}</div></div>`).join('');
+    }
+
+    function triggerRobotUpdate() {
+      if (robotUpdateTriggered || currentContact !== 'robot') return;
+      robotUpdateTriggered = true;
+      const container = document.getElementById('chatMessages');
+      const updateDiv = document.createElement('div');
+      updateDiv.innerHTML = `<div class="message-row other"><div class="message-bubble">自动备份机器人更新成功，新版本已为您增添检索功能。您可以输入备份编码查找整理好的文件。如果是未分类文件，您也可以输入关键词进行检索。</div></div>`;
+      container.appendChild(updateDiv);
+
+      const optionsDiv = document.createElement('div');
+      optionsDiv.className = 'option-buttons';
+      optionsDiv.innerHTML = `<button class="option-btn" id="opt1">啊？</button><button class="option-btn" id="opt2">真的假的？</button>`;
+      container.appendChild(optionsDiv);
+      container.scrollTop = container.scrollHeight;
+
+      const handleOption = () => {
+        optionsDiv.remove();
+        ['Home-0806-12', 'Hospital-0616-11', 'Online-0311-10'].forEach(file => {
+          const fileDiv = document.createElement('div');
+          fileDiv.className = 'message-row other';
+          fileDiv.innerHTML = `<div class="message-bubble file-bubble" data-file="${file}">📎 ${file}</div>`;
+          container.appendChild(fileDiv);
+          fileDiv.querySelector('.file-bubble').addEventListener('click', (e) => showFileContent(e.target.dataset.file));
+        });
+        container.scrollTop = container.scrollHeight;
+      };
+      document.getElementById('opt1').addEventListener('click', handleOption);
+      document.getElementById('opt2').addEventListener('click', handleOption);
+    }
+
+    function showFileContent(fileCode) {
+      const gender = userInfo.gender;
+      const sibling = gender === '男' ? '哥哥' : '姐姐';
+      let contentHtml = '';
+      if (fileCode === 'Home-0806-12') {
+        contentHtml = `<div class="file-content-card"><strong>📝 电子日记 · Home-0806-12</strong><br><br>我总是在深夜想起她。<br><br>如果那天我没有答应那个项目，如果我坚持让家里人知道她的病情，是不是一切都会不一样。她那么年轻，那么爱笑，每次视频都对我说“${sibling}我没事，就是小感冒”。我竟然信了。<br><br>直到最后，我都没能见到她最后一面。母亲在电话里哭得说不出话，后来她看我的眼神里全是怨恨——因为是我瞒着所有人，是我让她以为只是小病。我永远无法原谅自己。<br><br>这间房子到处都是她的痕迹，她的画笔，她的笑声。可我再也没有妹妹了。</div>`;
+      } else if (fileCode === 'Hospital-0616-11') {
+        contentHtml = `<div class="file-content-card"><strong>📷 手写日记扫描 · Hospital-0616-11</strong><br><span style="font-size:12px;color:#666;">（本人要求上传）</span><br><br>今天天气不错，主治医生说指标有好转，我开心了一整天。隔壁床的阿姨教我织围巾，虽然织得歪歪扭扭，但时间过得很快。<br><br>${sibling}上周又来看我了，带了我最喜欢的草莓蛋糕和一本新的素描本。他/她瘦了好多，我知道他/她因为那个外派项目被公司辞退了，可他/她什么都不跟我说，还假装轻松。我有点担心。<br><br>马上就是我生日了，去年生日他/她带我去游乐园，那是我最开心的一天。对了，那个项目好像就是5月28号开始的，希望今年生日我们能好好过。</div>`;
+      } else if (fileCode === 'Online-0311-10') {
+        contentHtml = `
+          <div>
+            <div class="account-info">🏦 账户：6222 **** **** 5893<br>💰 余额：¥ 48,312.57</div>
+            <table class="bank-table">
+              <tr><th>日期</th><th>摘要</th><th>支出</th><th>余额</th></tr>
+              <tr><td>2025-01-15</td><td>靶向药（克唑替尼）</td><td>-12,500.00</td><td>60,812.57</td></tr>
+              <tr><td>2025-02-14</td><td>化疗辅助药物</td><td>-3,200.00</td><td>57,612.57</td></tr>
+              <tr><td>2025-03-01</td><td>免疫治疗针剂</td><td>-9,300.00</td><td>48,312.57</td></tr>
+            </table>
+            <p style="font-size:12px;color:#666;margin-top:8px;">* 本月费用已缴，余额不足请及时充值</p>
+          </div>`;
+      }
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `<div class="modal-box">${contentHtml}<button class="submit-btn" style="margin-top:16px;" id="closeFileModal">关闭</button></div>`;
+      document.body.appendChild(modal);
+      document.getElementById('closeFileModal').addEventListener('click', () => modal.remove());
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    }
+
+    renderApp();
+  })();
+</script>
+</body>
+</html>
