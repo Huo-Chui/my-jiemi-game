@@ -3,650 +3,440 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>微聊</title>
+  <title>飞信 · 工作平台</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      height: 100%;
-      width: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #1a1a1a;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f2f5; overflow: hidden; }
 
-    /* 整体容器，占满屏幕 */
-    .wechat-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      background: #f2f2f7;
-    }
+    .feixin-container { display: flex; height: 100vh; width: 100vw; background: #fff; }
 
-    /* 顶部状态栏 */
-    .wechat-status {
-      background: #ededed;
-      padding: 8px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      font-weight: 600;
-      color: #000;
-      height: 36px;
-      border-bottom: 1px solid #ddd;
+    /* 左侧边栏 - 宽度加大 */
+    .sidebar {
+      width: 100px; background: #2d3436; color: #fff;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 2;
     }
-    .back-btn {
-      cursor: pointer;
-      color: #007aff;
-      font-size: 14px;
-      font-weight: normal;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .back-btn:hover {
-      opacity: 0.7;
-    }
-    .status-center {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-weight: 500;
-    }
+    .back-link { color: #b2bec3; font-size: 13px; text-decoration: none; margin-bottom: 15px; display: flex; align-items: center; gap: 2px; transition: 0.2s; cursor: pointer; }
+    .back-link:hover { color: white; }
+    .welcome-text { font-size: 14px; margin-bottom: 20px; text-align: center; line-height: 1.4; word-break: break-all; padding: 0 4px; }
+    .search-box { width: 70px; height: 34px; background: #636e72; border-radius: 17px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; color: #b2bec3; font-size: 13px; pointer-events: none; opacity: 0.8; }
+    .nav-modules { display: flex; flex-direction: column; gap: 20px; width: 100%; align-items: center; }
+    .nav-item { width: 70px; height: 70px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; color: #b2bec3; cursor: pointer; transition: 0.2s; user-select: none; }
+    .nav-item.active { background: #0984e3; color: white; box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3); }
+    .nav-item.disabled { color: #636e72; pointer-events: none; }
+    .nav-item i { font-size: 24px; margin-bottom: 4px; }
 
-    /* 主内容区（列表+聊天） */
-    .wechat-body {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* 左侧聊天列表 */
-    .chat-list {
-      width: 220px;
-      min-width: 180px;
-      background: #fff;
-      border-right: 1px solid #ddd;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    .chat-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
-      transition: background 0.2s;
-    }
-    .chat-item:hover {
-      background: #e8e8e8;
-    }
-    .chat-item.active {
-      background: #c9e0fc;
-    }
-    .chat-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      background: #ccc;
-      margin-right: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      color: white;
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-    .chat-info {
-      flex: 1;
-      overflow: hidden;
-    }
-    .chat-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: #000;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .chat-preview {
-      font-size: 11px;
-      color: #999;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-top: 2px;
-    }
-    .chat-meta {
-      text-align: right;
-      font-size: 10px;
-      color: #bbb;
-      flex-shrink: 0;
-      margin-left: 6px;
-    }
-    .badge {
-      background: #f43530;
-      color: white;
-      font-size: 10px;
-      padding: 2px 5px;
-      border-radius: 10px;
-      margin-top: 4px;
-      display: inline-block;
-    }
-    .pinned {
-      font-size: 10px;
-      color: #999;
-      margin-right: 4px;
-    }
+    /* 中间联系人列表 */
+    .contact-list-panel { width: 240px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; overflow-y: auto; box-shadow: 0 0 15px rgba(0,0,0,0.02); }
+    .contact-item { display: flex; align-items: center; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f5; transition: 0.2s; }
+    .contact-item:hover { background: #f8f9fa; }
+    .contact-item.active { background: #e3f2fd; }
+    .contact-avatar { width: 40px; height: 40px; border-radius: 8px; background: #dfe6e9; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: #2d3436; font-weight: bold; flex-shrink: 0; }
+    .contact-info { overflow: hidden; }
+    .contact-name { font-size: 14px; font-weight: 500; }
+    .contact-last { font-size: 11px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* 右侧聊天窗口 */
-    .chat-window {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #f5f5f5;
-      min-width: 0;
+    .chat-window { flex: 1; display: flex; flex-direction: column; background: #f8f9fa; }
+    .chat-header { padding: 12px 20px; background: #fff; border-bottom: 1px solid #e0e0e0; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+    .reset-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b); border: none; color: white;
+      padding: 8px 18px; border-radius: 25px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(231,76,60,0.3);
     }
-    .chat-header {
-      background: #ededed;
-      padding: 8px 16px;
-      font-size: 15px;
-      font-weight: 500;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      height: 36px;
-    }
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .message-row {
-      display: flex;
-      margin-bottom: 8px;
-    }
-    .message-row.self {
-      justify-content: flex-end;
-    }
-    .message-row.other {
-      justify-content: flex-start;
-    }
-    .message-bubble {
-      max-width: 50%;
-      padding: 8px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.5;
-      word-break: break-all;
-    }
-    .message-row.other .message-bubble {
-      background: white;
-      border: 1px solid #e0e0e0;
-    }
-    .message-row.self .message-bubble {
-      background: #95ec69;
-    }
-    .message-time {
-      font-size: 10px;
-      color: #999;
-      margin-top: 2px;
-    }
-    .date-divider {
-      text-align: center;
-      font-size: 11px;
-      color: #999;
-      margin: 12px 0;
-    }
+    .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(231,76,60,0.4); }
 
-    .chat-input-bar {
-      background: #f7f7f7;
-      padding: 8px 12px;
-      border-top: 1px solid #ddd;
-      display: flex;
-      align-items: center;
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+    .date-divider { text-align: center; font-size: 12px; color: #999; margin: 16px 0; }
+    .message-row { display: flex; margin-bottom: 8px; }
+    .message-row.self { justify-content: flex-end; }
+    .message-row.other { justify-content: flex-start; }
+    .message-bubble { max-width: 50%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; background: white; border: 1px solid #e0e0e0; }
+    .message-row.self .message-bubble { background: #d6eaf8; }
+    .backup-status { margin-top: 6px; font-size: 11px; color: #7f8c8d; background: #ecf0f1; border-radius: 10px; padding: 3px 12px; display: inline-block; text-align: center; width: fit-content; }
+    .file-bubble { cursor: pointer; background: #e8f0fe; border: 1px solid #74b9ff; color: #0984e3; text-decoration: underline; }
+
+    /* 输入框区域 */
+    .chat-input-wrapper { padding: 12px 20px; background: #fff; border-top: 1px solid #e0e0e0; display: flex; flex-direction: column; }
+    .quick-options { display: flex; gap: 8px; margin-bottom: 8px; }
+    .quick-option {
+      background: #f0f0f0; border: 1px solid #ddd; border-radius: 18px;
+      padding: 6px 16px; font-size: 13px; cursor: pointer; transition: 0.2s;
     }
+    .quick-option:hover { background: #e0e0e0; }
+    .chat-input-bar { display: flex; gap: 8px; }
     .chat-input-bar input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 13px;
-      background: #fff;
-      color: #999;
-      pointer-events: none;
+      flex: 1; padding: 10px 16px; border: 1px solid #ddd; border-radius: 20px;
+      background: #f5f5f5; color: #333; font-size: 14px;
     }
+    .chat-input-bar input:disabled { background: #f5f5f5; color: #999; }
 
-    /* 响应式：小屏时缩小左侧列表 */
-    @media (max-width: 600px) {
-      .chat-list {
-        width: 160px;
-        min-width: 140px;
-      }
-      .chat-item {
-        padding: 10px 8px;
-      }
-      .chat-avatar {
-        width: 30px;
-        height: 30px;
-        font-size: 14px;
-        margin-right: 8px;
-      }
-      .chat-name {
-        font-size: 13px;
-      }
-      .chat-preview {
-        font-size: 10px;
-      }
-      .message-bubble {
-        max-width: 65%; /* 小屏上稍微放宽一点 */
-        font-size: 12px;
-      }
-      .wechat-status {
-        padding: 6px 12px;
-        height: 30px;
-        font-size: 12px;
-      }
-    }
+    /* 模态框 */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal-box { background: white; border-radius: 16px; padding: 24px; width: 90%; max-width: 420px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    .modal-box h3 { margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #555; }
+    .name-inputs { display: flex; gap: 8px; }
+    .name-inputs input { width: 70px; text-align: center; }
+    input[type="text"], input[type="number"] { padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; width: 100%; }
+    .radio-group { display: flex; gap: 20px; }
+    .radio-group label { display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; }
+    .error-msg { color: #d63031; font-size: 12px; margin-top: 4px; display: none; }
+    .submit-btn { background: #0984e3; color: white; border: none; padding: 10px 24px; border-radius: 20px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 10px; }
+    .submit-btn:hover { background: #0767b3; }
   </style>
 </head>
 <body>
-<div class="wechat-container">
-  <!-- 顶部状态栏，包含返回按钮 -->
-  <div class="wechat-status">
-    <a href="index.html" class="back-btn">← 返回</a>
-    <span class="status-center">微聊</span>
-    <span>📶 🔋</span>
-  </div>
-
-  <div class="wechat-body">
-    <!-- 左侧聊天列表 -->
-    <div class="chat-list" id="chatList">
-      <!-- 动态生成 -->
-    </div>
-
-    <!-- 右侧聊天窗口 -->
-    <div class="chat-window" id="chatWindow">
-      <div class="chat-header" id="chatHeader">选择一个聊天</div>
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-input-bar">
-        <input type="text" placeholder="暂时无法输入" disabled>
-      </div>
-    </div>
-  </div>
-</div>
+<div id="app"></div>
 
 <script>
-  // ========== 聊天数据 ==========
-  const contacts = [
-    { id: 'work', name: 'AAA工作群', pinned: true, unread: 35, lastMsg: '王姐：周末有人看新上映的电影吗...', lastTime: '3/29', avatar: '群', color: '#576b95' },
-    { id: 'mom', name: '岁月静好', pinned: true, unread: 0, lastMsg: '妈：排骨买好了，明天早点回来', lastTime: '3/29', avatar: '妈', color: '#f0a060' },
-    { id: 'sister', name: '攻击意大利人中', pinned: true, unread: 0, lastMsg: '妹妹：就是偶尔靠谱一次的意思', lastTime: '3/29', avatar: '妹', color: '#e87ca0' },
-    { id: 'group6', name: '月入十个达不6', pinned: false, unread: 6, lastMsg: '主角：那就烤肉，具体时间再约', lastTime: '3/29', avatar: '群', color: '#576b95' },
-    { id: 'charity', name: '请支持公益！', pinned: false, unread: 0, lastMsg: '请支持公益！：你也是，别太熬夜', lastTime: '3/28', avatar: '公', color: '#4caf50' },
-    { id: 'coach', name: '皮蛋solo粥', pinned: false, unread: 0, lastMsg: '皮蛋solo粥：嘿，开心就完了！', lastTime: '3/27', avatar: '皮', color: '#ff9800' },
-    { id: 'media', name: '不羡仙', pinned: false, unread: 0, lastMsg: '不羡仙：出来第一个发你，给点意见', lastTime: '3/27', avatar: '仙', color: '#e91e63' },
-    { id: 'news', name: '做法不加班', pinned: false, unread: 0, lastMsg: '做法不加班：客气。睡了，明天值班。', lastTime: '3/29', avatar: '加', color: '#607d8b' }
-  ];
+  (function() {
+    const STORAGE_KEY = 'feixin_user';
+    const STATE_KEY = 'feixin_state';
+    let userInfo = null;
+    let currentContact = 'robot';
+    let gameState = {};
 
-  // 消息数据
-  const messagesData = {
-    work: [
-      { sender: '老张', text: '@所有人 明天周一，大家记得带工牌，门禁系统升级了', time: '3/23 09:15' },
-      { sender: '小李', text: '收到！😂 差点忘了', time: '3/23 09:16' },
-      { sender: '王姐', text: '听说新门禁还能记录迟到早退？', time: '3/23 09:20' },
-      { sender: '老张', text: '对，大家注意点', time: '3/23 09:21' },
-      { sender: '阿杰', text: '这个点发消息是怕我们周末过得太开心吗', time: '3/23 09:25' },
-      { sender: '小李', text: '😂😂😂', time: '3/23 09:26' },
-      { sender: '小陈', text: '本周三下午三点开月度总结会，请各位准备汇报材料', time: '3/24 08:30' },
-      { sender: '王姐', text: '又开会，上个月的材料我还没归档呢', time: '3/24 08:32' },
-      { sender: '阿杰', text: '开会是工作的一部分（面无表情）', time: '3/24 08:33' },
-      { sender: '老张', text: '请大家认真对待，汇报数据要准确', time: '3/24 08:35' },
-      { sender: '小李', text: '收到！第一次参加月度会，好紧张😨', time: '3/24 08:36' },
-      { sender: '王姐', text: '@小李 放心，就是走个过场，别紧张', time: '3/24 08:37' },
-      { sender: '王姐', text: '你们听说没，隔壁部门要合并过来了', time: '3/25 10:10' },
-      { sender: '小李', text: '啊？？？', time: '3/25 10:11' },
-      { sender: '阿杰', text: '哪个部门？', time: '3/25 10:12' },
-      { sender: '王姐', text: '市场二部，据说是因为业绩不行被砍了', time: '3/25 10:13' },
-      { sender: '老张', text: '别瞎传，等正式通知', time: '3/25 10:15' },
-      { sender: '大刘', text: '。', time: '3/25 10:20' },
-      { sender: '王姐', text: '我这消息什么时候错过😏', time: '3/25 10:21' },
-      { sender: '小李', text: '突然觉得压力好大😱', time: '3/25 10:22' },
-      { sender: '小陈', text: '下午三点别忘了开会，会议室301', time: '3/26 08:45' },
-      { sender: '王姐', text: '收到', time: '3/26 08:46' },
-      { sender: '阿杰', text: '我的PPT还没做……', time: '3/26 08:47' },
-      { sender: '老张', text: '@阿杰 你行', time: '3/26 08:48' },
-      { sender: '小李', text: '我昨天熬夜做完了！✌️', time: '3/26 08:49' },
-      { sender: '王姐', text: '新人就是有干劲，老阿姨羡慕', time: '3/26 08:50' },
-      { sender: '阿杰', text: '会开完了，活了半条命', time: '3/26 17:05' },
-      { sender: '王姐', text: '总结一下：啥也没说，说了两个小时', time: '3/26 17:06' },
-      { sender: '小李', text: '我觉得信息量挺大的啊……', time: '3/26 17:07' },
-      { sender: '王姐', text: '@小李 三个月后你就懂了', time: '3/26 17:08' },
-      { sender: '老张', text: '散了散了，明天还要上班', time: '3/26 17:10' },
-      { sender: '王姐', text: '今天午餐拼单，有人吗？', time: '3/27 11:30' },
-      { sender: '小李', text: '我我我！', time: '3/27 11:31' },
-      { sender: '阿杰', text: '+1', time: '3/27 11:32' },
-      { sender: '主角', text: '+1，吃什么', time: '3/27 11:33' },
-      { sender: '王姐', text: '楼下新开的湘菜馆，听说不错', time: '3/27 11:34' },
-      { sender: '小李', text: '湘菜！我的最爱！🌶️', time: '3/27 11:35' },
-      { sender: '阿杰', text: '下午还要干活，别太辣', time: '3/27 11:36' },
-      { sender: '王姐', text: '点微辣，满足小李也照顾大家', time: '3/27 11:37' },
-      { sender: '小李', text: '太好吃了！就是有点辣😂', time: '3/27 13:05' },
-      { sender: '阿杰', text: '我现在嘴巴还是麻的', time: '3/27 13:06' },
-      { sender: '王姐', text: '下次还拼吗', time: '3/27 13:07' },
-      { sender: '主角', text: '拼', time: '3/27 13:08' },
-      { sender: '老张', text: '本周工作总结发一下，@所有人', time: '3/28 16:00' },
-      { sender: '小李', text: '已发！✉️', time: '3/28 16:01' },
-      { sender: '王姐', text: '发了', time: '3/28 16:02' },
-      { sender: '阿杰', text: '稍等，还在写……', time: '3/28 16:03' },
-      { sender: '老张', text: '@阿杰 又拖', time: '3/28 16:04' },
-      { sender: '大刘', text: '发了', time: '3/28 16:05' },
-      { sender: '王姐', text: '大刘居然说话了', time: '3/28 16:06' },
-      { sender: '大刘', text: '。', time: '3/28 16:07' },
-      { sender: '小陈', text: '周五了，大家周末愉快', time: '3/28 16:10' },
-      { sender: '阿杰', text: '明天还要加班改图，不愉快', time: '3/28 16:11' },
-      { sender: '王姐', text: '心疼你两秒，然后我去逛街了', time: '3/28 16:12' },
-      { sender: '王姐', text: '周末有人看新上映的电影吗，据说口碑炸裂', time: '3/29 14:30' },
-      { sender: '小李', text: '哪部哪部？', time: '3/29 14:31' },
-      { sender: '王姐', text: '就那个悬疑片，朋友圈刷屏了', time: '3/29 14:32' },
-      { sender: '阿杰', text: '别提电影，我还在公司改图', time: '3/29 14:33' },
-      { sender: '小李', text: '@阿杰 哥你太惨了吧😂', time: '3/29 14:34' },
-      { sender: '阿杰', text: '别叫我哥，我还没三十', time: '3/29 14:35' },
-      { sender: '王姐', text: '哈哈哈哈哈哈', time: '3/29 14:36' },
-      { sender: '老张', text: '周末就好好休息，别水群了', time: '3/29 14:38' },
-      { sender: '王姐', text: '@老张 你也在水', time: '3/29 14:39' },
-      { sender: '老张', text: '……', time: '3/29 14:40' },
-    ],
-    mom: [
-      { sender: 'other', text: '孩子，今天降温了，加件外套', time: '3/23 08:10' },
-      { sender: 'self', text: '知道了妈，你也注意身体', time: '3/23 08:15' },
-      { sender: 'other', text: '家里那个电饭煲好像坏了，煮饭粘锅，回头我去看看买个新的', time: '3/23 08:16' },
-      { sender: 'self', text: '行，要不要我在网上帮你看看？', time: '3/23 08:17' },
-      { sender: 'other', text: '不用不用，我自己去店里挑，看得见摸得着放心些', time: '3/23 08:18' },
-      { sender: 'other', text: '今天风大，围巾戴了没', time: '3/24 07:50' },
-      { sender: 'self', text: '戴了，妈你比天气预报还准时', time: '3/24 07:52' },
-      { sender: 'other', text: '那天气预报有妈准吗', time: '3/24 07:53' },
-      { sender: 'self', text: '哈哈哈哈没有', time: '3/24 07:54' },
-      { sender: 'other', text: '孩子，你上次说的那个泡脚桶，我买了一款，用着挺舒服', time: '3/25 20:05' },
-      { sender: 'self', text: '那就好，你坚持泡，对身体好', time: '3/25 20:06' },
-      { sender: 'other', text: '你也是，别光说我，自己晚上早点睡', time: '3/25 20:07' },
-      { sender: 'other', text: '今天路过菜市场，看到卖土鸡蛋的，给你买了点，等你回来拿', time: '3/26 10:30' },
-      { sender: 'self', text: '好的，周末过去', time: '3/26 10:32' },
-      { sender: 'other', text: '不急，鸡蛋能放', time: '3/26 10:33' },
-      { sender: 'other', text: '今天天气好，把被子晒了晒', time: '3/27 14:00' },
-      { sender: 'self', text: '羡慕，我在办公室坐了一天', time: '3/27 14:05' },
-      { sender: 'other', text: '工作别太拼了，钱赚不完，身体要紧', time: '3/27 14:06' },
-      { sender: 'other', text: '周末回来吃饭吗，妈给你炖排骨汤', time: '3/28 17:00' },
-      { sender: 'self', text: '回来！想吃糖醋排骨', time: '3/28 17:02' },
-      { sender: 'other', text: '好好好，那就做糖醋排骨', time: '3/28 17:03' },
-      { sender: 'self', text: '😊', time: '3/28 17:04' },
-      { sender: 'other', text: '排骨买好了，明天早点回来', time: '3/29 09:20' },
-      { sender: 'self', text: '收到！', time: '3/29 09:22' },
-      { sender: 'other', text: '路上注意安全', time: '3/29 09:23' },
-      { sender: 'self', text: '好的妈', time: '3/29 09:24' },
-    ],
-    sister: [
-      { sender: 'other', text: '老登！！！！我今天吃到一家巨好吃的烤肉！！！', time: '3/23 12:20' },
-      { sender: 'self', text: '真的？下次带我去，不好吃你买单，好吃我买单', time: '3/23 12:22' },
-      { sender: 'other', text: '就我们上次路过那家，你非说看起来不好吃的那家', time: '3/23 12:23' },
-      { sender: 'self', text: '那结果如何', time: '3/23 12:24' },
-      { sender: 'other', text: '结果就是啪啪打你的脸', time: '3/23 12:25' },
-      { sender: 'self', text: '哈哈，那行，你带路我掏钱', time: '3/23 12:26' },
-      { sender: 'other', text: '我们公司来了个新同事，长得像某个明星', time: '3/24 09:30' },
-      { sender: 'self', text: '谁啊，我认识吗', time: '3/24 09:32' },
-      { sender: 'other', text: '不能说，说了你也不认识', time: '3/24 09:33' },
-      { sender: 'self', text: '那你多看两眼，上班更有动力', time: '3/24 09:34' },
-      { sender: 'other', text: '反正就是帅！但是人家有女朋友了，可惜', time: '3/24 09:35' },
-      { sender: 'self', text: '你上班还是去追星的', time: '3/24 09:36' },
-      { sender: 'other', text: '上班不影响欣赏美色！', time: '3/24 09:37' },
-      { sender: 'other', text: '今天加班加到现在，累成狗', time: '3/25 21:10' },
-      { sender: 'self', text: '吃晚饭了没，别饿着', time: '3/25 21:12' },
-      { sender: 'other', text: '吃了公司楼下的泡面', time: '3/25 21:13' },
-      { sender: 'self', text: '下次我帮你点个外卖，别老吃泡面', time: '3/25 21:14' },
-      { sender: 'other', text: '泡面怎么不算！有蛋有肠有青菜，豪华版！', time: '3/25 21:15' },
-      { sender: 'self', text: '行，有道理啊', time: '3/25 21:16' },
-      { sender: 'other', text: '今天中午同事请吃披萨！那个芝士拉丝有这么长——', time: '3/26 12:40' },
-      { sender: 'self', text: '你比划我也看不到，不过听起来很满足', time: '3/26 12:42' },
-      { sender: 'other', text: '反正就是超级满足！我一个人吃了三块', time: '3/26 12:43' },
-      { sender: 'self', text: '三块？减肥怎么办', time: '3/26 12:44' },
-      { sender: 'other', text: '吃披萨不谈减肥，这是原则问题', time: '3/26 12:45' },
-      { sender: 'self', text: '说得对', time: '3/26 12:46' },
-      { sender: 'other', text: '老登，我买了一件新衣服', time: '3/27 20:05' },
-      { sender: 'other', text: '[图片]', time: '3/27 20:06' },
-      { sender: 'other', text: '好看吗', time: '3/27 20:07' },
-      { sender: 'self', text: '还行', time: '3/27 20:10' },
-      { sender: 'other', text: '你说还行是吧', time: '3/27 20:11' },
-      { sender: 'self', text: '开玩笑的，真的好看，很适合你', time: '3/27 20:12' },
-      { sender: 'other', text: '今天周五，心情好到飞起', time: '3/28 18:00' },
-      { sender: 'other', text: '我决定明天睡到自然醒，谁也别叫我', time: '3/28 18:01' },
-      { sender: 'self', text: '那我也睡到中午，一起点外卖，你想吃啥', time: '3/28 18:03' },
-      { sender: 'other', text: '你怎么知道我要睡到中午', time: '3/28 18:04' },
-      { sender: 'self', text: '因为你每周六都这样', time: '3/28 18:05' },
-      { sender: 'other', text: '这叫生活的仪式感', time: '3/28 18:06' },
-      { sender: 'other', text: '下个月然姐过生日，我还在纠结送什么', time: '3/29 15:30' },
-      { sender: 'other', text: '送化妆品？送包包？送首饰？感觉都太普通了', time: '3/29 15:31' },
-      { sender: 'self', text: '要不一起去商场逛逛，看看实物再定，说不定有灵感', time: '3/29 15:33' },
-      { sender: 'other', text: '可以可以！啥时候去？！', time: '3/29 15:34' },
-      { sender: 'self', text: '都行，慢慢挑', time: '3/29 15:35' },
-      { sender: 'other', text: 'ok！难得靠谱一次', time: '3/29 15:36' },
-      { sender: 'self', text: '我一直很靠谱好吧，只是你发现得晚', time: '3/29 15:37' },
-      { sender: 'other', text: '就是偶尔靠谱一次的意思', time: '3/29 15:38' },
-      { sender: 'self', text: '……', time: '3/29 15:39' },
-    ],
-    group6: [
-      { sender: '皮蛋solo粥', text: '[视频] 笑死我了这个猫，比我带的那些小崽子还难搞', time: '3/23 18:20' },
-      { sender: '妹妹', text: '哈哈哈哈哈哈哈', time: '3/23 18:21' },
-      { sender: '不羡仙', text: '猫的演技比你拍的素材自然多了', time: '3/23 18:22' },
-      { sender: '请支持公益！', text: '别这么说，猫也有不配合的时候嘛', time: '3/23 18:23' },
-      { sender: '做法不加班', text: '。', time: '3/23 18:25' },
-      { sender: '妹妹', text: '不加班你今天怎么不说话', time: '3/23 18:26' },
-      { sender: '做法不加班', text: '在改稿，先挂着', time: '3/23 18:27' },
-      { sender: '不羡仙', text: '周末谁有空，出来吃饭！', time: '3/24 11:00' },
-      { sender: '妹妹', text: '我我我！这周累死了需要补充能量', time: '3/24 11:01' },
-      { sender: '不羡仙', text: '补充能量=火锅，懂', time: '3/24 11:02' },
-      { sender: '皮蛋solo粥', text: '怎么又是火锅，能不能整点硬的，烤肉不行吗', time: '3/24 11:03' },
-      { sender: '妹妹', text: '烤肉也行，但是我投火锅一票', time: '3/24 11:04' },
-      { sender: '请支持公益！', text: '我都可以，看大家', time: '3/24 11:05' },
-      { sender: '做法不加班', text: '你们定，我到点就来', time: '3/24 11:06' },
-      { sender: '皮蛋solo粥', text: '[视频] 这个土味短剧绝了，我训练的时候都在想台词', time: '3/25 12:15' },
-      { sender: '妹妹', text: '这什么东西哈哈哈哈哈', time: '3/25 12:16' },
-      { sender: '不羡仙', text: '我看完了，居然有点上头', time: '3/25 12:17' },
-      { sender: '请支持公益！', text: '你们都在看这个？我是不是也要补补课', time: '3/25 12:18' },
-      { sender: '做法不加班', text: '别看了，浪费时间，我帮你们看了，就是烂尾', time: '3/25 12:19' },
-      { sender: '主角', text: '你什么时候看的', time: '3/25 12:20' },
-      { sender: '做法不加班', text: '昨晚加班到凌晨，顺便刷完了', time: '3/25 12:21' },
-      { sender: '不羡仙', text: '最近有没有人想去爬山，我找到一条很出片的路线', time: '3/26 10:05' },
-      { sender: '皮蛋solo粥', text: '爬！不过别太陡，我怕我膝盖扛不住', time: '3/26 10:06' },
-      { sender: '妹妹', text: '多大难度算不难', time: '3/26 10:07' },
-      { sender: '不羡仙', text: '就正常台阶，穿着板鞋都能上', time: '3/26 10:08' },
-      { sender: '妹妹', text: '那我ok！', time: '3/26 10:09' },
-      { sender: '主角', text: '报名', time: '3/26 10:10' },
-      { sender: '请支持公益！', text: '我也去，刚好可以顺便看看那边有没有需要帮助的村子', time: '3/26 10:11' },
-      { sender: '做法不加班', text: '你们安排，我到时候看能不能走得开', time: '3/26 10:12' },
-      { sender: '妹妹', text: '[图片] 路边看到一只流浪猫，好乖', time: '3/27 17:40' },
-      { sender: '请支持公益！', text: '好小一只，附近有没有宠物医院？要不先带去看看', time: '3/27 17:41' },
-      { sender: '皮蛋solo粥', text: '你随身带猫粮吗', time: '3/27 17:42' },
-      { sender: '妹妹', text: '没有，下次一定', time: '3/27 17:43' },
-      { sender: '不羡仙', text: '拍得不错啊，这张构图有天赋', time: '3/27 17:44' },
-      { sender: '妹妹', text: '真的吗！是用手机随便拍的', time: '3/27 17:45' },
-      { sender: '做法不加班', text: '猫的眼神很警惕，估计是刚走丢的', time: '3/27 17:46' },
-      { sender: '请支持公益！', text: '附近有没有小区群？先问问看是不是有人丢了猫', time: '3/27 17:47' },
-      { sender: '不羡仙', text: '周五了！素材剪完了！感觉这次播放量要涨', time: '3/28 20:10' },
-      { sender: '皮蛋solo粥', text: '播放量高了你请客', time: '3/28 20:11' },
-      { sender: '不羡仙', text: '请，必须请，火锅我都认了', time: '3/28 20:12' },
-      { sender: '妹妹', text: '你说的啊！群里所有人作证', time: '3/28 20:13' },
-      { sender: '请支持公益！', text: '好，我截图了', time: '3/28 20:14' },
-      { sender: '做法不加班', text: '周五而已，我明天还要加班排版', time: '3/28 20:15' },
-      { sender: '主角', text: '不加班太惨了，周六我们发好吃的照片给你', time: '3/28 20:16' },
-      { sender: '做法不加班', text: '你们是魔鬼吗', time: '3/28 20:17' },
-      { sender: '主角', text: '过几天一起出来玩吧，好久没聚了', time: '3/29 11:00' },
-      { sender: '妹妹', text: '可以可以！', time: '3/29 11:01' },
-      { sender: '皮蛋solo粥', text: '终于等到这句话，训练累死我了', time: '3/29 11:02' },
-      { sender: '不羡仙', text: '去哪去哪，我相机都准备好了', time: '3/29 11:03' },
-      { sender: '主角', text: '还没定，你们有什么建议', time: '3/29 11:04' },
-      { sender: '皮蛋solo粥', text: '别火锅就行，求求了', time: '3/29 11:05' },
-      { sender: '妹妹', text: '😡', time: '3/29 11:06' },
-      { sender: '不羡仙', text: '烤肉吧，上次那家韩式烤肉，老板都认识我了', time: '3/29 11:07' },
-      { sender: '请支持公益！', text: '同意，那家味道不错，而且环境好，不吵', time: '3/29 11:08' },
-      { sender: '做法不加班', text: '行，提前一天定时间，我好请假', time: '3/29 11:09' },
-      { sender: '皮蛋solo粥', text: '不加班居然要请假，太阳打西边出来了', time: '3/29 11:10' },
-      { sender: '做法不加班', text: '年纪小不代表不想休息', time: '3/29 11:11' },
-      { sender: '主角', text: '那就烤肉，具体时间再约', time: '3/29 11:12' },
-    ],
-    charity: [
-      { sender: 'self', text: '最近忙吗', time: '3/24 20:10' },
-      { sender: 'other', text: '在整理一批山区学校的图书捐赠，有点忙不过挺充实的。', time: '3/24 20:12' },
-      { sender: 'self', text: '那挺好，需要帮忙吗', time: '3/24 20:13' },
-      { sender: 'other', text: '暂时不用，都是琐碎的事，我能应付。那些孩子收到书的时候眼睛都在发光，想想就觉得值了。', time: '3/24 20:14' },
-      { sender: 'self', text: '我这边有一些旧衣服，可以捐吗', time: '3/26 13:30' },
-      { sender: 'other', text: '可以的。衣服干净、八九成新就行，叠好分开装方便我们分拣。', time: '3/26 13:32' },
-      { sender: 'self', text: '明白，我整理一下。', time: '3/26 13:33' },
-      { sender: 'other', text: '谢谢你。山区那边过冬物资还缺不少，每一件对他们来说都很重要。', time: '3/26 13:34' },
-      { sender: 'self', text: '小事。', time: '3/26 13:35' },
-      { sender: 'other', text: '不是小事，真的。有些孩子冬天只有一件薄外套，看着心疼。', time: '3/26 13:36' },
-      { sender: 'other', text: '衣服整理得怎么样了？不急，慢慢来。', time: '3/28 10:00' },
-      { sender: 'self', text: '还没，周末弄。', time: '3/28 10:02' },
-      { sender: 'other', text: '好，弄完告诉我，我让人去取，你别自己跑一趟。', time: '3/28 10:03' },
-      { sender: 'self', text: '你周末也不休息？', time: '3/28 10:04' },
-      { sender: 'other', text: '在整理回访资料，看看之前帮助过的人现在过得怎么样。不算累。', time: '3/28 10:05' },
-      { sender: 'self', text: '注意身体', time: '3/28 10:06' },
-      { sender: 'other', text: '你也是，别太熬夜。', time: '3/28 10:07' },
-    ],
-    coach: [
-      { sender: 'self', text: '最近咋样', time: '3/24 16:20' },
-      { sender: 'other', text: '带一群小豆丁踢球，刚开学没几天就晒成碳了', time: '3/24 16:22' },
-      { sender: 'other', text: '哈哈哈今天训练有个小子球鞋飞了，鞋飞了球进了，你敢信？', time: '3/25 17:30' },
-      { sender: 'self', text: '这也行', time: '3/25 17:32' },
-      { sender: 'other', text: '大家都笑得不行，他光着一只脚跳着去找鞋，屁事儿没有', time: '3/25 17:33' },
-      { sender: 'self', text: '这心理素质可以啊', time: '3/25 17:34' },
-      { sender: 'other', text: '八岁，正是天不怕地不怕的时候，比我们强', time: '3/25 17:35' },
-      { sender: 'other', text: '有个家长说小孩在家天天念叨我厉害，非要来学球', time: '3/27 14:00' },
-      { sender: 'self', text: '哈哈，你确实厉害', time: '3/27 14:02' },
-      { sender: 'other', text: '厉不厉害另说，那丫头来了三天就学会颠球十几个，是个苗子', time: '3/27 14:03' },
-      { sender: 'self', text: '那你赚了', time: '3/27 14:04' },
-      { sender: 'other', text: '赚啥，我给他打折学费了，看不得好苗子被埋没', time: '3/27 14:05' },
-      { sender: 'self', text: '你这教练当的，贴钱上班', time: '3/27 14:06' },
-      { sender: 'other', text: '嘿，开心就完了！', time: '3/27 14:07' },
-    ],
-    media: [
-      { sender: 'other', text: '我要开新系列了！街头美食猎人，专找犄角旮旯的老店，想想就兴奋。', time: '3/24 09:30' },
-      { sender: 'self', text: '听起来不错，什么时候开始？', time: '3/24 09:32' },
-      { sender: 'other', text: '这周就开拍，已经在踩点了。', time: '3/24 09:33' },
-      { sender: 'other', text: '踩点拍了一些素材，但感觉太普通了，没什么亮点。', time: '3/26 15:10' },
-      { sender: 'self', text: '你想找什么样的？', time: '3/26 15:12' },
-      { sender: 'other', text: '有故事的老店，老板能聊，那种有烟火气的。', time: '3/26 15:13' },
-      { sender: 'self', text: '城西好像有家面馆开了四十年，回头我把地址给你。', time: '3/26 15:14' },
-      { sender: 'other', text: '好！这种店就是宝藏，先去看看。', time: '3/26 15:15' },
-      { sender: 'other', text: '那家面馆太棒了，老板讲了好多故事，我录了两个小时，素材绝对够。', time: '3/27 19:00' },
-      { sender: 'self', text: '那就好，期待成片。', time: '3/27 19:02' },
-      { sender: 'other', text: '出来第一个发你，给点意见，不好你要直说。', time: '3/27 19:03' },
-      { sender: 'self', text: '行，我可不会客气。', time: '3/27 19:04' },
-    ],
-    news: [
-      { sender: 'self', text: '在？问个事', time: '3/24 22:30' },
-      { sender: 'other', text: '嗯，你说', time: '3/24 22:31' },
-      { sender: 'self', text: '你们报纸能登个人写的小说吗？普通的那种', time: '3/24 22:32' },
-      { sender: 'other', text: '可以，副刊有小说连载栏目。长篇还是短篇？', time: '3/24 22:33' },
-      { sender: 'self', text: '长篇，我就随便问问，还没动笔呢', time: '3/24 22:34' },
-      { sender: 'other', text: '那你先写着，需要的话我帮你问编辑要投稿要求', time: '3/24 22:35' },
-      { sender: 'self', text: '行，谢了', time: '3/24 22:36' },
-      { sender: 'other', text: '帮你问了，副刊编辑说长篇连载需要先写三章样稿，通过后安排排期', time: '3/25 23:05' },
-      { sender: 'self', text: '好，我先构思一下，不急', time: '3/25 23:06' },
-      { sender: 'other', text: '稿费大概千字八十，不算高，但能积攒读者', time: '3/25 23:07' },
-      { sender: 'self', text: '了解了，谢谢你跑一趟', time: '3/25 23:08' },
-      { sender: 'other', text: '没事，反正我也在报社，顺路', time: '3/25 23:09' },
-      { sender: 'self', text: '那个小说的事，我又想了一下，可能先放放', time: '3/27 23:00' },
-      { sender: 'other', text: '行，随时可以再问', time: '3/27 23:01' },
-      { sender: 'other', text: '还没睡？', time: '3/27 00:20' },
-      { sender: 'self', text: '你不是也没睡', time: '3/27 00:21' },
-      { sender: 'other', text: '我刚下班，排版排到现在', time: '3/27 00:22' },
-      { sender: 'self', text: '太辛苦了', time: '3/27 00:23' },
-      { sender: 'other', text: '习惯了，年纪小扛得住。你也早点休息', time: '3/27 00:24' },
-      { sender: 'other', text: '编辑说如果改主意了，随时可以投稿', time: '3/29 15:00' },
-      { sender: 'self', text: '好，谢谢你还记着', time: '3/29 15:02' },
-      { sender: 'other', text: '客气。睡了，明天值班。', time: '3/29 15:03' },
-      { sender: 'self', text: '晚安', time: '3/29 15:04' },
-    ]
-  };
+    function isValidChinese(str) { return /^[\u4e00-\u9fa5]+$/.test(str); }
+    function generatePhone() { return Array.from({length: 10}, () => Math.floor(Math.random() * 10)).join(''); }
 
-  // ========== 渲染函数 ==========
-  let currentChatId = 'work';
+    const backupRecords = [
+      { date: '3/23', file: '工作周报0323.docx', type: 'success' },
+      { date: '3/23', file: '会议纪要0323.pdf', type: 'success' },
+      { date: '3/24', file: '体检报告0324.pdf', type: 'success' },
+      { date: '3/25', file: '项目进度表.xlsx', type: 'fail' },
+      { date: '3/25', file: '项目进度表(重传).xlsx', type: 'success' },
+      { date: '3/26', file: '血常规报告.pdf', type: 'success' },
+      { date: '3/27', file: 'CT影像资料.zip', type: 'fail' },
+      { date: '3/27', file: 'CT影像资料.zip', type: 'success' },
+      { date: '3/28', file: '外勤审批单.pdf', type: 'success' },
+      { date: '3/29', file: '心电图报告0329.pdf', type: 'success' },
+    ];
 
-  function renderChatList() {
-    const listEl = document.getElementById('chatList');
-    listEl.innerHTML = contacts.map(c => `
-      <div class="chat-item${c.id === currentChatId ? ' active' : ''}" data-id="${c.id}">
-        <div class="chat-avatar" style="background:${c.color}">${c.avatar}</div>
-        <div class="chat-info">
-          <div class="chat-name">${c.pinned ? '<span class="pinned">📌</span>' : ''}${c.name}</div>
-          <div class="chat-preview">${c.lastMsg}</div>
-        </div>
-        <div class="chat-meta">
-          <div>${c.lastTime}</div>
-          ${c.unread > 0 ? `<div class="badge">${c.unread}</div>` : ''}
-        </div>
-      </div>
-    `).join('');
-    // 绑定点击
-    document.querySelectorAll('.chat-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const id = item.dataset.id;
-        if (id) switchChat(id);
-      });
-    });
-  }
+    const otherContacts = {
+      '大刘': [ {sender:'other', text:'那个报表下班前发我。'}, {sender:'self', text:'好的，已经发了。'} ],
+      '王姐': [ {sender:'other', text:'今天午餐拼单，来不来？'}, {sender:'self', text:'来，老地方。'} ],
+      '小李': [ {sender:'other', text:'救命，打印机又卡纸了！'}, {sender:'self', text:'重启一下试试。'} ],
+      '阿杰': [ {sender:'other', text:'设计稿改完了，看下邮件。'}, {sender:'self', text:'收到，辛苦了。'} ],
+      '老张': [ {sender:'other', text:'明天项目验收，都准备好。'}, {sender:'self', text:'明白，材料已备齐。'} ],
+    };
 
-  function switchChat(id) {
-    currentChatId = id;
-    renderChatList();
-    const contact = contacts.find(c => c.id === id);
-    document.getElementById('chatHeader').textContent = contact.name;
-    renderMessages(id);
-  }
+    // 加载状态
+    function loadState() {
+      const saved = localStorage.getItem(STATE_KEY);
+      gameState = saved ? JSON.parse(saved) : { robotUpdated: false, filesShown: false };
+    }
+    function saveState() {
+      localStorage.setItem(STATE_KEY, JSON.stringify(gameState));
+    }
 
-  function renderMessages(chatId) {
-    const msgs = messagesData[chatId] || [];
-    const container = document.getElementById('chatMessages');
-    let html = '';
-    let lastDate = '';
-    msgs.forEach(msg => {
-      const date = msg.time.split(' ')[0];
-      if (date !== lastDate) {
-        html += `<div class="date-divider">${date}</div>`;
-        lastDate = date;
+    function renderApp() {
+      loadState();
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        userInfo = JSON.parse(saved);
+        renderMainUI();
+      } else {
+        renderSetupModal();
       }
-      const isSelf = msg.sender === 'self' || msg.sender === '主角';
-      const senderName = msg.sender === 'self' ? '' : msg.sender;
-      html += `
-        <div class="message-row ${isSelf ? 'self' : 'other'}">
-          <div style="width: 100%; ${isSelf ? 'display: flex; flex-direction: column; align-items: flex-end;' : 'display: flex; flex-direction: column; align-items: flex-start;'}">
-            ${!isSelf ? `<div style="font-size:10px;color:#999;margin-bottom:2px;">${senderName}</div>` : ''}
-            <div class="message-bubble" style="max-width:100%;">${msg.text}</div>
-            <div class="message-time">${msg.time.split(' ')[1] || ''}</div>
+    }
+
+    function renderSetupModal() {
+      const phone = generatePhone();
+      document.getElementById('app').innerHTML = `
+        <div class="modal-overlay" id="setupModal">
+          <div class="modal-box">
+            <h3>🔧 系统升级 · 个人信息设置</h3>
+            <p style="font-size:13px;color:#666;margin-bottom:20px;">请完善以下信息，部分字段已自动生成</p>
+            <div class="form-group">
+              <label>头像（自动生成）</label>
+              <div id="avatarPreview" style="width:50px;height:50px;border-radius:50%;background:#74b9ff;color:white;display:flex;align-items:center;justify-content:center;font-size:22px;">?</div>
+            </div>
+            <div class="form-group">
+              <label>姓名</label>
+              <div class="name-inputs">
+                <input type="text" id="lastName" placeholder="姓(最多2字)" maxlength="2">
+                <input type="text" id="firstName" placeholder="名(最多2字)" maxlength="2">
+              </div>
+              <div class="error-msg" id="nameError">请输入汉字</div>
+            </div>
+            <div class="form-group">
+              <label>性别</label>
+              <div class="radio-group">
+                <label><input type="radio" name="gender" value="男" checked> 男</label>
+                <label><input type="radio" name="gender" value="女"> 女</label>
+              </div>
+            </div>
+            <div class="form-group"><label>地区</label><input type="text" value="瀛洲市" disabled></div>
+            <div class="form-group"><label>手机号</label><input type="text" value="${phone}" disabled id="phoneField"></div>
+            <div class="form-group">
+              <label>生日（月/日可修改）</label>
+              <div style="display:flex;gap:8px;">
+                <select id="birthMonth">${Array.from({length:12}, (_,i) => `<option value="${i+1}" ${(new Date().getMonth()+1===i+1)?'selected':''}>${i+1}月</option>`).join('')}</select>
+                <select id="birthDay">${Array.from({length:31}, (_,i) => `<option value="${i+1}" ${(new Date().getDate()===i+1)?'selected':''}>${i+1}日</option>`).join('')}</select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>个人签名（最多10个汉字）</label>
+              <input type="text" id="signature" placeholder="必填" maxlength="10">
+              <div class="error-msg" id="sigError">请输入1-10个汉字</div>
+            </div>
+            <button class="submit-btn" id="submitSetup">进入飞信</button>
           </div>
         </div>
       `;
-    });
-    container.innerHTML = html;
-    container.scrollTop = container.scrollHeight;
-  }
+      const lastName = document.getElementById('lastName');
+      const firstName = document.getElementById('firstName');
+      const updateAvatar = () => {
+        const name = (lastName.value.trim() + firstName.value.trim()) || '?';
+        document.getElementById('avatarPreview').textContent = name.charAt(0);
+      };
+      lastName.addEventListener('input', updateAvatar);
+      firstName.addEventListener('input', updateAvatar);
 
-  // 初始化
-  renderChatList();
-  switchChat('work');
+      document.getElementById('submitSetup').addEventListener('click', () => {
+        const ln = lastName.value.trim(), fn = firstName.value.trim();
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+        const month = document.getElementById('birthMonth').value;
+        const day = document.getElementById('birthDay').value;
+        const sig = document.getElementById('signature').value.trim();
+
+        if (!isValidChinese(ln) || !isValidChinese(fn) || ln.length>2 || fn.length>2 || ln.length===0 || fn.length===0) {
+          document.getElementById('nameError').style.display='block'; return;
+        }
+        document.getElementById('nameError').style.display='none';
+        if (!isValidChinese(sig) || sig.length<1 || sig.length>10) {
+          document.getElementById('sigError').style.display='block'; return;
+        }
+        document.getElementById('sigError').style.display='none';
+
+        userInfo = {
+          lastName: ln, firstName: fn, fullName: ln+fn, gender,
+          region: '瀛洲市', phone: document.getElementById('phoneField').value,
+          birthday: `${month}月${day}日`, signature: sig
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(userInfo));
+        gameState = { robotUpdated: false, filesShown: false };
+        saveState();
+        renderMainUI();
+      });
+    }
+
+    function renderMainUI() {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="feixin-container">
+          <div class="sidebar">
+            <a href="index.html" class="back-link">← 桌面</a>
+            <div class="welcome-text">欢迎回来，<br>${userInfo.firstName || userInfo.fullName}</div>
+            <div class="search-box">🔍</div>
+            <div class="nav-modules">
+              <div class="nav-item active" id="navMessage"><i>💬</i> 消息</div>
+              <div class="nav-item disabled"><i>📋</i> 工作台</div>
+              <div class="nav-item disabled"><i>👥</i> 通讯录</div>
+              <div class="nav-item disabled"><i>⋯</i> 更多</div>
+            </div>
+          </div>
+          <div class="contact-list-panel" id="contactListPanel">${renderContactList()}</div>
+          <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+              <span id="chatTitle">自动备份机器人</span>
+              <button class="reset-btn" id="resetBtn">🔄 重新开始点我</button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-wrapper">
+              <div class="quick-options" id="quickOptions" style="display:none;"></div>
+              <div class="chat-input-bar">
+                <input type="text" id="chatInput" placeholder="暂时无法输入" disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.querySelectorAll('.contact-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const id = item.dataset.id;
+          if (id) switchContact(id);
+        });
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STATE_KEY);
+        location.reload();
+      });
+
+      switchContact('robot');
+      // 恢复状态
+      if (gameState.robotUpdated) {
+        if (gameState.filesShown) {
+          // 直接显示文件和选项？不，选项已经选过，所以直接显示文件
+          appendRobotFiles();
+        } else {
+          // 仅触发更新消息和选项，但未选
+          showRobotUpdateAndOptions();
+        }
+      } else {
+        // 尚未触发，设置定时器
+        setTimeout(triggerRobotUpdate, 5000);
+      }
+    }
+
+    function renderContactList() {
+      const contacts = [
+        { id: 'robot', name: '自动备份机器人', avatar: '🤖' },
+        { id: '大刘', name: '大刘', avatar: '刘' },
+        { id: '王姐', name: '王姐', avatar: '王' },
+        { id: '小李', name: '小李', avatar: '李' },
+        { id: '阿杰', name: '阿杰', avatar: '杰' },
+        { id: '老张', name: '老张', avatar: '张' },
+      ];
+      return contacts.map(c => `
+        <div class="contact-item ${c.id===currentContact?'active':''}" data-id="${c.id}">
+          <div class="contact-avatar">${c.avatar}</div>
+          <div class="contact-info"><div class="contact-name">${c.name}</div><div class="contact-last">${c.id==='robot'?'备份记录':'...'}</div></div>
+        </div>
+      `).join('');
+    }
+
+    function switchContact(id) {
+      currentContact = id;
+      document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+      const activeEl = document.querySelector(`.contact-item[data-id="${id}"]`);
+      if (activeEl) activeEl.classList.add('active');
+      document.getElementById('chatTitle').textContent = id === 'robot' ? '自动备份机器人' : id;
+      renderMessages(id);
+      // 如果不是机器人，禁用输入框并隐藏快捷选项
+      const input = document.getElementById('chatInput');
+      const quickDiv = document.getElementById('quickOptions');
+      if (id !== 'robot') {
+        input.disabled = true;
+        input.placeholder = '暂时无法输入';
+        quickDiv.style.display = 'none';
+      } else {
+        // 机器人的输入状态由状态决定
+        if (gameState.robotUpdated && !gameState.filesShown) {
+          input.disabled = false;
+          input.placeholder = '点击下方选项或输入…';
+          quickDiv.style.display = 'flex';
+        } else {
+          input.disabled = true;
+          input.placeholder = '暂时无法输入';
+          quickDiv.style.display = 'none';
+        }
+      }
+    }
+
+    function renderMessages(contactId) {
+      const container = document.getElementById('chatMessages');
+      if (contactId === 'robot') {
+        container.innerHTML = renderRobotMessages();
+        // 恢复已显示的文件或更新消息
+        if (gameState.robotUpdated) {
+          if (!gameState.filesShown) {
+            // 重新添加更新消息和选项
+            const updateDiv = document.createElement('div');
+            updateDiv.className = 'message-row other';
+            updateDiv.innerHTML = '<div class="message-bubble">自动备份机器人更新成功，新版本已为您增添检索功能。您可以输入备份编码查找整理好的文件。如果是未分类文件，您也可以输入关键词进行检索。</div>';
+            container.appendChild(updateDiv);
+          } else {
+            // 直接添加文件消息
+            appendRobotFiles();
+          }
+        }
+      } else {
+        container.innerHTML = renderOtherContact(contactId);
+      }
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderRobotMessages() {
+      let html = '', lastDate = '';
+      backupRecords.forEach(rec => {
+        if (rec.date !== lastDate) { html += `<div class="date-divider">${rec.date}</div>`; lastDate = rec.date; }
+        html += `<div class="message-row self"><div><div class="message-bubble">${rec.file}</div><div class="backup-status">${rec.type==='success' ? '✅ 备份成功' : '❌ 备份失败'}</div></div></div>`;
+      });
+      return html;
+    }
+
+    function renderOtherContact(name) {
+      const msgs = otherContacts[name] || [];
+      return msgs.map(m => `<div class="message-row ${m.sender==='self'?'self':'other'}"><div class="message-bubble">${m.text}</div></div>`).join('');
+    }
+
+    // 触发机器人更新（首次）
+    function triggerRobotUpdate() {
+      if (gameState.robotUpdated || currentContact !== 'robot') return;
+      gameState.robotUpdated = true;
+      saveState();
+      showRobotUpdateAndOptions();
+    }
+
+    function showRobotUpdateAndOptions() {
+      if (currentContact !== 'robot') return;
+      const container = document.getElementById('chatMessages');
+      // 添加更新消息
+      const updateDiv = document.createElement('div');
+      updateDiv.className = 'message-row other';
+      updateDiv.innerHTML = '<div class="message-bubble">自动备份机器人更新成功，新版本已为您增添检索功能。您可以输入备份编码查找整理好的文件。如果是未分类文件，您也可以输入关键词进行检索。</div>';
+      container.appendChild(updateDiv);
+
+      // 启用输入框并显示快捷选项
+      const input = document.getElementById('chatInput');
+      const quickDiv = document.getElementById('quickOptions');
+      input.disabled = false;
+      input.placeholder = '点击下方选项或输入…';
+      quickDiv.style.display = 'flex';
+      quickDiv.innerHTML = `
+        <span class="quick-option" data-opt="1">啊？</span>
+        <span class="quick-option" data-opt="2">真的假的？</span>
+      `;
+      document.querySelectorAll('.quick-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          const optText = e.target.textContent;
+          // 发送用户消息
+          const selfDiv = document.createElement('div');
+          selfDiv.className = 'message-row self';
+          selfDiv.innerHTML = `<div class="message-bubble">${optText}</div>`;
+          container.appendChild(selfDiv);
+          // 隐藏选项，禁用输入
+          quickDiv.style.display = 'none';
+          input.disabled = true;
+          input.placeholder = '暂时无法输入';
+          container.scrollTop = container.scrollHeight;
+
+          // 标记文件已显示
+          gameState.filesShown = true;
+          saveState();
+          // 发送三个文件
+          appendRobotFiles();
+        });
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function appendRobotFiles() {
+      if (currentContact !== 'robot') return;
+      const container = document.getElementById('chatMessages');
+      const files = ['Home-0806-12', 'Hospital-0616-11', 'Online-0311-10'];
+      files.forEach(file => {
+        const fileDiv = document.createElement('div');
+        fileDiv.className = 'message-row other';
+        fileDiv.innerHTML = `<div class="message-bubble file-bubble" data-file="${file}">📎 ${file}</div>`;
+        container.appendChild(fileDiv);
+        fileDiv.querySelector('.file-bubble').addEventListener('click', (e) => {
+          const fileName = e.target.dataset.file;
+          // 跳转到对应页面
+          window.location.href = `${fileName.toLowerCase()}.html`;
+        });
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    renderApp();
+  })();
 </script>
 </body>
 </html>
